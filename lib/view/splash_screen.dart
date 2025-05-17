@@ -36,7 +36,7 @@ Widget build(BuildContext context) {
         children: [
           // Logo / Branding
           BounceInDown(
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 3),
             child: RichText(
               text: TextSpan(
                 style: const TextStyle(

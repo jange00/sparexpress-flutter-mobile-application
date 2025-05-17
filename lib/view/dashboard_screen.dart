@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sparexpress/view/home/home_page.dart';
-
 import 'package:sparexpress/view/login_screen.dart';
 
 
@@ -15,6 +14,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
   final Color themeColor = const Color(0xFFFFC107);
 
+  final List<Widget> _pages = const [
+    HomePage(),
+    CartPage(),
+    OrdersPage(),
+    ProfilePage(),
+  ];
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
@@ -41,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 3,
       ),
 
-      
+       body: _pages[_selectedIndex],
        
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
