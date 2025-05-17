@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sparexpress/common/common_snackbar.dart';
 import 'package:sparexpress/view/dashboard_screen.dart';
 import 'package:sparexpress/view/signup_screen.dart';
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Logo
-             const SizedBox(height: 30),
+             const SizedBox(height: 10),
             Text.rich(
               TextSpan(
                 text: "Spare",
@@ -114,7 +115,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 2),
+             Container(
+  height: 200,
+  width: 400,
+  child: Lottie.asset('assets/animation/sign_in_animation.json'),
+),
 
             Text(
               "Welcome Back!",
@@ -125,6 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 6),
+            
             Text(
               "Sign in to access your account and start shopping",
               textAlign: TextAlign.center,
@@ -134,6 +141,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 30),
+            
+          
 
             // Toggle between email/phone login
             Row(
