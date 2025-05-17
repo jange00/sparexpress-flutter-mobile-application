@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigate() {
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 4), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    backgroundColor: const Color(0xFFFFC107), // Amber background
+    backgroundColor: const Color(0xFFFFC107), 
     body: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +60,7 @@ Widget build(BuildContext context) {
           ),
 
           const SizedBox(height: 2),
-          Lottie.asset('assets/animation/loading.json')
+          Lottie.asset('assets/animation/loading2.json')
 
           // Loading Animation (Fade In)
           // FadeInUp(
