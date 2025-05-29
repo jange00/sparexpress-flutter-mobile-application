@@ -40,7 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         title: const Text("SpareXpress",style: TextStyle(fontWeight: FontWeight.bold),),
         centerTitle: true,
-        backgroundColor: themeColor,
+        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.black,
         elevation: 3,
       ),
