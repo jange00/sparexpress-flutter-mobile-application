@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sparexpress/theme/sparexpress_theme.dart';
 import 'package:sparexpress/view/splash_screen.dart';
 
 class MyApp extends StatelessWidget {
@@ -10,6 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
+      theme: myApplicationTheme(),
       home: const SplashScreen(),
     );
   }

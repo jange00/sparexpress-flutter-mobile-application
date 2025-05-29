@@ -28,7 +28,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.chevron_left),
@@ -39,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           },
         ),
-        title: const Text("SpareXpress"),
+        title: const Text("SpareXpress",style: TextStyle(fontWeight: FontWeight.bold),),
         centerTitle: true,
         backgroundColor: themeColor,
         foregroundColor: Colors.black,
