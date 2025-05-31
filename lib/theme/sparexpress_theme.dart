@@ -6,7 +6,7 @@ ThemeData myApplicationTheme() {
     primaryColor: const Color(0xffffc107),
     primarySwatch: Colors.blue,
     scaffoldBackgroundColor: Colors.grey[100],
-    fontFamily: "OpenSans Italic",
+    fontFamily: "OpenSans Bold",
    
   );
 }
