@@ -1,18 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sparexpress/theme/sparexpress_theme.dart';
-import 'package:sparexpress/view/splash_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
+import 'package:sparexpress/app/theme/app_theme.dart';
+import 'package:sparexpress/features/splash/presentation/view/splash_view.dart';
+import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Student Management',
       debugShowCheckedModeBanner: false,
-      theme: myApplicationTheme(),
-      home: const SplashScreen(),
+      theme: AppTheme.getApplicationTheme(isDarkMode: false),
+      home: BlocProvider.value(
+        value: serviceLocator<SplashViewModel>(),
+        child: SplashView(),
+      ),
     );
   }
 }
