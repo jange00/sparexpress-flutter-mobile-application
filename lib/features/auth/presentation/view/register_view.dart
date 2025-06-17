@@ -1,17 +1,23 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_event.dart';
+import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
+
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
+
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -22,33 +28,122 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _showPassword = false;
   bool _showConfirmPassword = false;
   bool _termsAccepted = false;
-  File? _profileImage;
 
-  Future<void> _pickProfileImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
+  // Check for camera permission
+  Future<void> checkCameraPermission() async {
+    if (await Permission.camera.request().isRestricted ||
+        await Permission.camera.request().isDenied) {
+      await Permission.camera.request();
     }
   }
 
-  void _submitForm() {
-    if (!_termsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please accept the terms & conditions"),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
+  File? _profileImage;
 
-    if (_formKey.currentState?.validate() ?? false) {
-      debugPrint("Submitted: ${_fullNameController.text}");
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedImage = await ImagePicker().pickImage(source: source);
+      if (pickedImage != null) {
+        setState(() {
+          // Send image to server
+          _profileImage = File(pickedImage.path);
+          context.read<RegisterViewModel>().add(UploadImageEvent(file: _profileImage!));
+        });
+      }
+    } catch (e) {
+      debugPrint(e.toString());
     }
+  }
+
+  void _showImagePickerBottomSheet() {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Select Profile Picture',
+              style: GoogleFonts.montserrat(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildImageSourceButton(
+                  icon: Icons.camera_alt,
+                  label: 'Camera',
+                  onTap: () {
+                    checkCameraPermission().then((_) {
+                      _pickImage(ImageSource.camera);
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+                _buildImageSourceButton(
+                  icon: Icons.photo_library,
+                  label: 'Gallery',
+                  onTap: () {
+                    checkCameraPermission().then((_) {
+                      _pickImage(ImageSource.gallery);
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageSourceButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 32, color: const Color(0xFFFFC107)),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   InputDecoration _inputDecoration(String label) {
@@ -64,6 +159,31 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
     );
+  }
+
+  void _submitForm() {
+    if (!_termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please accept the terms & conditions"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (_formKey.currentState!.validate()) {
+      context.read<RegisterViewModel>().add(
+        RegisterCustomerEvent(
+          context: context,
+          fullName: _fullNameController.text,
+          phoneNumber: _phoneController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
+      );
+    }
   }
 
   @override
@@ -102,17 +222,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Text(
-                    //   "Welcome Back!",
-                    //   style: GoogleFonts.montserrat(
-                    //     fontSize: 24,
-                    //     fontWeight: FontWeight.w600,
-                    //     color: Colors.grey[800],
-                    //   ),
-                    // ),
-                    const SizedBox(height: 2),
                     Text(
-                      "Sign up account and start shopping",
+                      "Create your account and start shopping",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.montserrat(
                         fontSize: 14,
@@ -133,16 +244,29 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     // Profile Picker
                     GestureDetector(
-                      onTap: _pickProfileImage,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.grey.shade200,
-                        backgroundImage: _profileImage != null
-                            ? FileImage(_profileImage!)
-                            : null,
-                        child: _profileImage == null
-                            ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
-                            : null,
+                      onTap: _showImagePickerBottomSheet,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: _profileImage != null
+                              ? FileImage(_profileImage!)
+                              : null,
+                          child: _profileImage == null
+                              ? const Icon(Icons.camera_alt, size: 30, color: Colors.grey)
+                              : null,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -170,7 +294,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(12),
@@ -262,7 +386,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     spacing,
 
-                    // Sign Up Button
+                    // Register Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -277,7 +401,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           elevation: 3,
                         ),
                         child: const Text(
-                          "Sign Up",
+                          "Register",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -295,9 +419,17 @@ class _SignupScreenState extends State<SignupScreen> {
           Positioned(
             top: 40,
             left: 16,
-            child: IconButton(
-              icon: const Icon(Icons.chevron_left, size: 32),
-              onPressed: () => Navigator.pop(context),
+            child: SafeArea(
+              child: IconButton(
+                icon: const Icon(Icons.chevron_left, size: 32),
+                onPressed: () => Navigator.pop(context),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withOpacity(0.9),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
