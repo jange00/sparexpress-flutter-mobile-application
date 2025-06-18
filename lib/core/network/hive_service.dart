@@ -12,7 +12,7 @@ class HiveService {
     Hive.init(path);
 
     // Register Adapters
-
+    Hive.registerAdapter(CustomerHiveModelAdapter());
 
      // Add Dummy Data
     // await addBatchData();
