@@ -9,13 +9,15 @@ import 'package:sparexpress/features/auth/presentation/view/register_view.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
+import 'package:sparexpress/features/home/presentation/view/home_view.dart';
+import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState>{
   final CustomerLoginUseCase _customerLoginUseCase;
 
   LoginViewModel(this._customerLoginUseCase) : super(LoginState.initial()) {
     on<NavigateToRegisterViewEvent>(_onNavigateToRegisterView);
-    // on<NavigateToHomeViewEvent>(_onNavigateToHomeView);
+    on<NavigateToHomeViewEvent>(_onNavigateToHomeView);
     on<LoginWithEmailAndPasswordEvent>(_onLoginWithEmailAndPassword);
   }
 
@@ -39,27 +41,30 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
     }
   }
 
-  //   void _onNavigateToHomeView(
-  //   NavigateToHomeViewEvent event,
-  //   Emitter<LoginState> emit,
-  // ) {
-  //   if (event.context.mounted) {
-  //     Navigator.pushReplacement(
-  //       event.context,
-  //       MaterialPageRoute(
-  //         builder: (context) => BlocProvider.value(
-  //           value: serviceLocator<HomeViewModel>(),
-  //           child: const HomeView(),
-  //         ),
-  //       ),
-  //     );
-  //   }
-  // }
+    void _onNavigateToHomeView(
+    NavigateToHomeViewEvent event,
+    Emitter<LoginState> emit,
+  ) {
+    if (event.context.mounted) {
+      Navigator.pushReplacement(
+        event.context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: serviceLocator<HomeViewModel>(),
+            child: const HomeView(),
+          ),
+        ),
+      );
+    }
+  }
 
    void _onLoginWithEmailAndPassword(
     LoginWithEmailAndPasswordEvent event,
     Emitter<LoginState> emit,
   ) async {
+     print('Login Event Triggered');
+      print('Email: ${event.email}');
+      print('Password: ${event.password}');
     emit(state.copyWith(isLoading: true));
     final result = await _customerLoginUseCase(
       LoginParams(email: event.email, password: event.password),
@@ -79,6 +84,15 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
       (token) {
         // Handle success case
         emit(state.copyWith(isLoading: false, isSuccess: true));
+              Navigator.pushReplacement(
+        event.context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: serviceLocator<HomeViewModel>(),
+            child: const HomeView(),
+          ),
+        ),
+      );
         // add(NavigateToHomeViewEvent(context: event.context));
       },
     );

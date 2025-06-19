@@ -9,19 +9,20 @@ class NavigateToRegisterViewEvent extends LoginEvent{
   NavigateToRegisterViewEvent({required this.context});
 }
 
-// class NavigateToHomeViewEvent extends LoginEvent{
-//   final BuildContext context;
+class NavigateToHomeViewEvent extends LoginEvent{
+  final BuildContext context;
 
-//   NavigateToHomeViewEvent({required this.context});
-// }
+  NavigateToHomeViewEvent({required this.context});
+}
 
 class LoginWithEmailAndPasswordEvent extends LoginEvent{
   final BuildContext context;
   final String email;
   final String password;
   // final String phoneNumber;
-
+  
   LoginWithEmailAndPasswordEvent({
+    
     required this.context,
     required this.email,
     required this.password,
