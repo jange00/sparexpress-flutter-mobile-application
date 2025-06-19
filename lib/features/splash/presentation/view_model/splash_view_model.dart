@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/auth/presentation/view/login_view.dart';
+import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 
 class SplashViewModel extends Cubit<void> {
   SplashViewModel() : super(null);
@@ -17,7 +18,7 @@ class SplashViewModel extends Cubit<void> {
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider.value(
-            value: serviceLocator<SplashViewModel>(),
+            value: serviceLocator<LoginViewModel>(),
             child: LoginView(),
           ),
         ),

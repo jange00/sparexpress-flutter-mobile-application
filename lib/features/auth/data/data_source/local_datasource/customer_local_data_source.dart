@@ -11,8 +11,11 @@ class CustomerLocalDataSource implements ICustomerDataSource {
 
   @override
   Future<String> loginCustomer(String email, String password) async {
+    print("calling from login ");
+
     try {
       final customerData = await _hiveService.login(email, password);
+      print("customer data:$customerData");
       if (customerData != null && customerData.password == password) {
         return "Login successful";
       } else {

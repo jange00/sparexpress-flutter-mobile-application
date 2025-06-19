@@ -22,7 +22,6 @@ class HiveService {
   }
 
   // Login using email and password
-  // Future<>
   Future<void> close() async {
     await Hive.close();
   }
@@ -51,16 +50,26 @@ class HiveService {
   }
 
   // Login using username and password
-  Future<CustomerHiveModel?> login(String email, String password) async {
-    var box = await Hive.openBox<CustomerHiveModel>(
-      HiveTableConstant.customerBox,
-    );
-    var customer = box.values.firstWhere(
+Future<CustomerHiveModel?> login(String email, String password) async {
+  print("Trying to login with email: $email");
+
+  final box = await Hive.openBox<CustomerHiveModel>(
+    HiveTableConstant.customerBox,
+  );
+
+  try {
+    final customer = box.values.firstWhere(
       (element) => element.email == email && element.password == password,
-      orElse: () => throw Exception('Invalid email or password'),
     );
-    box.close();
+
+    print("Login success: $customer");
+    await box.close();
     return customer;
+  } catch (e) {
+    print("Login failed: $e");
+    await box.close();
+    return null; // return null if not found
   }
+}
 
 }

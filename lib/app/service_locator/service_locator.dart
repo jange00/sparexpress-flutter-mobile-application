@@ -8,6 +8,7 @@ import 'package:sparexpress/features/auth/domain/use_case/customer_login_usecase
 import 'package:sparexpress/features/auth/domain/use_case/customer_register_usecase.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
+import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 
 final serviceLocator = GetIt.instance;
@@ -17,7 +18,8 @@ Future<void> initDependencies() async {
   // await initApiModule();
 
   // Initialize all modules
-  _initAuthModule();
+  await _initAuthModule();
+  await _initHomeModel();
   await _initSplashModule();
 }
 
@@ -26,7 +28,7 @@ Future<void> _initHiveService() async {
 }
 
 // Auth
-void _initAuthModule() {
+Future <void> _initAuthModule() async {
   serviceLocator.registerLazySingleton<CustomerLocalDataSource>(
     () => CustomerLocalDataSource(hiveService: serviceLocator<HiveService>()),
   );
@@ -70,6 +72,13 @@ void _initAuthModule() {
 
   serviceLocator.registerFactory(
     () => LoginViewModel(serviceLocator<CustomerLoginUseCase>()),
+  );
+}
+
+// Home
+Future<void> _initHomeModel() async {
+  serviceLocator.registerFactory(
+    () => HomeViewModel(loginViewModel: serviceLocator<LoginViewModel>()),
   );
 }
 
