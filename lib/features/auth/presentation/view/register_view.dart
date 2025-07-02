@@ -18,6 +18,7 @@ class RegisterView extends StatelessWidget {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  // File? _profileImage;
 
   final ValueNotifier<String> _selectedCountryCode = ValueNotifier('+977');
   final ValueNotifier<bool> _showPassword = ValueNotifier(false);
