@@ -5,8 +5,13 @@ import 'package:sparexpress/features/home/presentation/view/bottom_view/dashboar
 class HomeState{
   final int selectedIndex;
   final List<Widget> views;
+  final String fullname;
 
-  const HomeState({ required this.selectedIndex, required this.views});
+  const HomeState({ 
+    required this.selectedIndex, 
+    required this.views,
+    required this.fullname
+    });
 
   // Initial State
   static HomeState initial() {
@@ -17,13 +22,19 @@ class HomeState{
         // BlocProvider.value(),
         AccountView(),
       ],
+       fullname: "Guest", // default or empty string
       );
   }
 
-  HomeState copyWith({int? selectedIndex, List<Widget>? views}) {
+  HomeState copyWith({
+    int? selectedIndex, 
+    List<Widget>? views,
+    String? fullname,
+    }) {
     return HomeState(
       selectedIndex: selectedIndex  ?? this.selectedIndex, 
-    views: views ?? this.views
+    views: views ?? this.views,
+    fullname: fullname ?? this.fullname,
     );
   }
 }
