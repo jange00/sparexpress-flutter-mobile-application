@@ -4,7 +4,6 @@ import 'package:sparexpress/app/constant/hive_table_constant.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:uuid/uuid.dart';
 
-// dart run build_runner build -d
 part 'product_hive_model.g.dart';
 
 @HiveType(typeId: HiveTableConstant.productTableId)
@@ -19,35 +18,47 @@ class ProductHiveModel extends Equatable {
   final String categoryId;
 
   @HiveField(3)
-  final String subCategoryId;
+  final String categoryTitle;
 
   @HiveField(4)
-  final String brandId;
+  final String subCategoryId;
 
   @HiveField(5)
-  final double price;
+  final String subCategoryTitle;
 
   @HiveField(6)
-  final List<String> image;
+  final String brandId;
 
   @HiveField(7)
-  final String? description;
+  final String brandTitle;
 
   @HiveField(8)
-  final int stock;
+  final double price;
 
   @HiveField(9)
-  final double shippingCharge;
+  final List<String> image;
 
   @HiveField(10)
+  final String? description;
+
+  @HiveField(11)
+  final int stock;
+
+  @HiveField(12)
+  final double shippingCharge;
+
+  @HiveField(13)
   final double? discount;
 
   ProductHiveModel({
     String? productId,
     required this.name,
     required this.categoryId,
+    required this.categoryTitle,
     required this.subCategoryId,
+    required this.subCategoryTitle,
     required this.brandId,
+    required this.brandTitle,
     required this.price,
     required this.image,
     this.description,
@@ -60,8 +71,11 @@ class ProductHiveModel extends Equatable {
       : productId = '',
         name = '',
         categoryId = '',
+        categoryTitle = '',
         subCategoryId = '',
+        subCategoryTitle = '',
         brandId = '',
+        brandTitle = '',
         price = 0.0,
         image = const [],
         description = '',
@@ -73,8 +87,11 @@ class ProductHiveModel extends Equatable {
         productId: entity.productId,
         name: entity.name,
         categoryId: entity.categoryId,
+        categoryTitle: entity.categoryTitle,
         subCategoryId: entity.subCategoryId,
+        subCategoryTitle: entity.subCategoryTitle,
         brandId: entity.brandId,
+        brandTitle: entity.brandTitle,
         price: entity.price,
         image: entity.image,
         description: entity.description,
@@ -87,8 +104,11 @@ class ProductHiveModel extends Equatable {
         productId: productId,
         name: name,
         categoryId: categoryId,
+        categoryTitle: categoryTitle,
         subCategoryId: subCategoryId,
+        subCategoryTitle: subCategoryTitle,
         brandId: brandId,
+        brandTitle: brandTitle,
         price: price,
         image: image,
         description: description,
@@ -105,8 +125,11 @@ class ProductHiveModel extends Equatable {
         productId,
         name,
         categoryId,
+        categoryTitle,
         subCategoryId,
+        subCategoryTitle,
         brandId,
+        brandTitle,
         price,
         image,
         description,

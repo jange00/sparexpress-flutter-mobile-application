@@ -12,7 +12,13 @@ import 'package:sparexpress/features/auth/domain/use_case/customer_login_usecase
 import 'package:sparexpress/features/auth/domain/use_case/customer_register_usecase.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
+// import 'package:sparexpress/features/home/data/data_source/local_datasource/product_local_data_source.dart';
+import 'package:sparexpress/features/home/data/data_source/remote_datasource/product_remote_data_source.dart';
+import 'package:sparexpress/features/home/data/repository/remote_repository/product_remote_repository.dart';
+import 'package:sparexpress/features/home/domin/repository/products_repository.dart';
+import 'package:sparexpress/features/home/domin/use_case/get_all_product_usecase.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
+import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 
 final serviceLocator = GetIt.instance;
@@ -25,6 +31,7 @@ Future<void> initDependencies() async {
   await _initAuthModule();
   await _initHomeModel();
   await _initSplashModule();
+  await _initProductModule();
 }
 
 Future<void> _initHiveService() async {
@@ -98,6 +105,32 @@ Future<void> _initHomeModel() async {
     () => HomeViewModel(loginViewModel: serviceLocator<LoginViewModel>()),
   );
 }
+
+// Product
+Future<void> _initProductModule() async {
+  // Remote Data Source
+serviceLocator.registerFactory<ProductRemoteDataSource>(
+  () => ProductRemoteDataSource(apiService: serviceLocator<ApiService>()),
+);
+
+// Repository
+serviceLocator.registerFactory<IProductRepository>(
+  () => ProductRemoteRepository(productRemoteDataSource: serviceLocator<ProductRemoteDataSource>()),
+);
+
+// UseCase
+serviceLocator.registerFactory<GetAllProductUsecase>(
+  () => GetAllProductUsecase(productRepository: serviceLocator<IProductRepository>()),
+);
+
+// Bloc
+serviceLocator.registerFactory<ProductBloc>(
+  () => ProductBloc(getAllProducts: serviceLocator<GetAllProductUsecase>()),
+);
+
+}
+
+
 
 // Splash
 Future<void> _initSplashModule() async {

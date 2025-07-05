@@ -23,11 +23,7 @@ class ApiEndpoints {
   static const String updateUsers = "auth/users/:id";
   static const String deleteUsers = "auth/users/:id";
 
-  // Category
-
-  // SubCategory
-
-  // Brands
-
-  // Products ..etc
+  // Products
+  static const String getAllProducts = "admin/products";
+  static const String getProductsById = "admin/products/:id";
 }

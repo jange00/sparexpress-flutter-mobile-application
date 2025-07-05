@@ -20,21 +20,24 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       productId: fields[0] as String?,
       name: fields[1] as String,
       categoryId: fields[2] as String,
-      subCategoryId: fields[3] as String,
-      brandId: fields[4] as String,
-      price: fields[5] as double,
-      image: (fields[6] as List).cast<String>(),
-      description: fields[7] as String?,
-      stock: fields[8] as int,
-      shippingCharge: fields[9] as double,
-      discount: fields[10] as double?,
+      categoryTitle: fields[3] as String,
+      subCategoryId: fields[4] as String,
+      subCategoryTitle: fields[5] as String,
+      brandId: fields[6] as String,
+      brandTitle: fields[7] as String,
+      price: fields[8] as double,
+      image: (fields[9] as List).cast<String>(),
+      description: fields[10] as String?,
+      stock: fields[11] as int,
+      shippingCharge: fields[12] as double,
+      discount: fields[13] as double?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ProductHiveModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.productId)
       ..writeByte(1)
@@ -42,20 +45,26 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       ..writeByte(2)
       ..write(obj.categoryId)
       ..writeByte(3)
-      ..write(obj.subCategoryId)
+      ..write(obj.categoryTitle)
       ..writeByte(4)
-      ..write(obj.brandId)
+      ..write(obj.subCategoryId)
       ..writeByte(5)
-      ..write(obj.price)
+      ..write(obj.subCategoryTitle)
       ..writeByte(6)
-      ..write(obj.image)
+      ..write(obj.brandId)
       ..writeByte(7)
-      ..write(obj.description)
+      ..write(obj.brandTitle)
       ..writeByte(8)
-      ..write(obj.stock)
+      ..write(obj.price)
       ..writeByte(9)
-      ..write(obj.shippingCharge)
+      ..write(obj.image)
       ..writeByte(10)
+      ..write(obj.description)
+      ..writeByte(11)
+      ..write(obj.stock)
+      ..writeByte(12)
+      ..write(obj.shippingCharge)
+      ..writeByte(13)
       ..write(obj.discount);
   }
 

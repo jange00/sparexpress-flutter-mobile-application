@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sparexpress/features/home/presentation/view/bottom_view/dashboard_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_state.dart';
-import 'package:sparexpress/features/home/presentation/widgets/search_bar.dart';
-import 'package:sparexpress/features/home/presentation/widgets/banner_slider.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final searchController = TextEditingController();
-
     return BlocBuilder<HomeViewModel, HomeState>(
       builder: (context, state) {
         final fullname = state.fullname;
+
+        // Select which widget to show based on selectedIndex
+        Widget bodyWidget;
+        switch (state.selectedIndex) {
+          case 0:
+            bodyWidget = const DashboardView();
+            break;
+          case 1:
+            bodyWidget = const Center(child: Text('Order Page'));
+            break;
+          case 2:
+            bodyWidget = const Center(child: Text('Cart Page'));
+            break;
+          case 3:
+            bodyWidget = const Center(child: Text('Account Page'));
+            break;
+          default:
+            bodyWidget = const DashboardView();
+        }
 
         return Scaffold(
           appBar: PreferredSize(
@@ -73,7 +89,7 @@ class HomeView extends StatelessWidget {
                     ),
                     const CircleAvatar(
                       radius: 28,
-                      backgroundImage: AssetImage('assets/images/user_avatar.jpg'),
+                      backgroundImage: AssetImage('assets/images/mouse.jpg'),
                       backgroundColor: Colors.white24,
                     ),
                   ],
@@ -82,43 +98,7 @@ class HomeView extends StatelessWidget {
             ),
           ),
 
-          body: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-
-                  // Search Bar
-                  SearchBarWidget(
-                    controller: searchController,
-                    onSearch: (query) {
-                      print('Searching for: $query');
-                      // TODO: Implement search logic
-                    },
-                  ),
-
-                  // const SizedBox(height: 12),
-
-                  // // Banner Slider
-                  // BannerSliderWidget(
-                  //   bannerImages: const [
-                  //     'assets/images/mouse.jpg',
-                  //     'assets/images/wire.jpg',
-                  //   ],
-                  // ),
-
-                  // Main Content
-                  // SizedBox(
-                  //   height: MediaQuery.of(context).size.height * 0.6,
-                  //   child: state.views.elementAt(state.selectedIndex),
-                  // ),
-                ],
-              ),
-            ),
-          ),
+          body: bodyWidget,
 
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
