@@ -4,12 +4,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sparexpress/features/home/presentation/view/bottom_view/dashboard_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final searchController = TextEditingController();
+
     return BlocBuilder<HomeViewModel, HomeState>(
       builder: (context, state) {
         final fullname = state.fullname;
@@ -98,7 +101,24 @@ class HomeView extends StatelessWidget {
             ),
           ),
 
-          body: bodyWidget,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              children: [
+                // Search bar moved here
+                SearchBarWidget(
+                  controller: searchController,
+                  onSearch: (query) {
+                    print('Searching: $query');
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Flexible body content
+                Expanded(child: bodyWidget),
+              ],
+            ),
+          ),
 
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,

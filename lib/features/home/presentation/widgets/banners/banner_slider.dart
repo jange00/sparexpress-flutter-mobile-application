@@ -16,13 +16,13 @@ class BannerSliderWidget extends StatelessWidget {
         aspectRatio: 16 / 9,
         viewportFraction: 0.9,
       ),
-      items: bannerImages.map((imageUrl) {
+      items: bannerImages.map((imagePath) {
         return Builder(
           builder: (BuildContext context) {
             return ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageUrl,
+              child: Image.asset(
+                imagePath,
                 fit: BoxFit.cover,
                 width: MediaQuery.of(context).size.width,
               ),
