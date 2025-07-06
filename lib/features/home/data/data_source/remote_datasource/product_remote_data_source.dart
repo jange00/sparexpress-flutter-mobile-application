@@ -20,8 +20,10 @@ Future<List<ProductEntity>> getProducts() async {
 
     if (response.statusCode == 200 && response.data != null) {
       try {
-        final dto = GetAllProductDTO.fromJson(response.data);
-        return ProductApiModel.toEntityList(dto.data);
+        final List<ProductEntity> entities = ProductApiModel.fromJsonList(response.data['data']);
+;
+        // final dto = GetAllProductDTO.fromJson(response.data);
+        return entities;
       } catch (e) {
         throw Exception("Parsing error: ${e.toString()}");
       }

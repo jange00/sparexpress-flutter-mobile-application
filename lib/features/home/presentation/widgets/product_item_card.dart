@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 
 class ProductItemCard extends StatelessWidget {
   final String name;
@@ -27,7 +29,8 @@ class ProductItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasDiscount = discount != null && discount! > 0;
-    final discountedPrice = hasDiscount ? price - (price * discount! / 100) : price;
+    final discountedPrice =
+        hasDiscount ? price - (price * discount! / 100) : price;
 
     return Card(
       elevation: 4,
@@ -41,18 +44,39 @@ class ProductItemCard extends StatelessWidget {
             // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: images.isNotEmpty
-                  ? Image.network(
-                      images.first,
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      height: 180,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image_not_supported, size: 60, color: Colors.grey),
-                    ),
+              child:
+                  images.isNotEmpty
+                      ? CachedNetworkImage(
+                        imageUrl:"http://localhost:3000/${images.first}",
+                        height: 180,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder:
+                            (context, url) => Container(
+                              height: 180,
+                              alignment: Alignment.center,
+                              child: const CircularProgressIndicator(),
+                            ),
+                        errorWidget:
+                            (context, url, error) => Container(
+                              height: 180,
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.broken_image,
+                                size: 60,
+                                color: Colors.grey,
+                              ),
+                            ),
+                      )
+                      : Container(
+                        height: 180,
+                        color: Colors.grey[300],
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 60,
+                          color: Colors.grey,
+                        ),
+                      ),
             ),
 
             const SizedBox(height: 12),
@@ -74,16 +98,22 @@ class ProductItemCard extends StatelessWidget {
                 ),
                 stock == 0
                     ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.red[400],
-                          borderRadius: BorderRadius.circular(12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red[400],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        "Out of Stock",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: const Text(
-                          "Out of Stock",
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      )
+                      ),
+                    )
                     : const SizedBox.shrink(),
               ],
             ),
@@ -113,14 +143,20 @@ class ProductItemCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.redAccent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       "-${discount!.toStringAsFixed(0)}%",
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -158,7 +194,9 @@ class ProductItemCard extends StatelessWidget {
                       backgroundColor: Colors.orangeAccent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),
@@ -171,7 +209,9 @@ class ProductItemCard extends StatelessWidget {
                       backgroundColor: Colors.deepOrange,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),

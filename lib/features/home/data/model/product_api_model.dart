@@ -68,9 +68,11 @@ class ProductApiModel extends Equatable {
   }
 
   /// List conversion
-  static List<ProductEntity> toEntityList(List<ProductApiModel> models) {
-    return models.map((model) => model.toEntity()).toList();
-  }
+  static List<ProductEntity> fromJsonList(List<dynamic> jsonList) {
+  return jsonList
+      .map((json) => ProductApiModel.fromJson(json as Map<String, dynamic>).toEntity())
+      .toList();
+}
 
   @override
   List<Object?> get props => [
