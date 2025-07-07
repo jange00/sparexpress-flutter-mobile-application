@@ -14,21 +14,23 @@ class CategoryListWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is CategoryLoaded) {
           return SizedBox(
-            height: 140, // Enough height for text + horizontal list
+            height: 150,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding: EdgeInsets.only(left: 4.0, bottom: 8),
+                  padding: EdgeInsets.only(left: 8.0, bottom: 8),
                   child: Text(
                     'Categories',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
                 ),
-                Expanded(
+                SizedBox(
+                  height: 110,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: state.categories.length,
@@ -37,20 +39,20 @@ class CategoryListWidget extends StatelessWidget {
                       final category = state.categories[index];
                       return InkWell(
                         onTap: () {
-                          // TODO: Handle category click
+                          // Handle category click
                         },
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
-                          width: 100,
-                          padding: const EdgeInsets.all(12),
+                          width: 140,  // Width increased from 100 to 140
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: const Color(0xFFc107),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
+                                color: Colors.black12.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
                               ),
                             ],
                             border: Border.all(color: Colors.grey.shade200),
@@ -58,10 +60,21 @@ class CategoryListWidget extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
-                                Icons.category,
-                                size: 28,
-                                color: Colors.blueAccent,
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xFF4FC3F7), Color(0xFF0288D1)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.category_outlined,
+                                  size: 24,
+                                  color: Colors.white,
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Text(
@@ -70,8 +83,9 @@ class CategoryListWidget extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
                                 ),
                               ),
                             ],

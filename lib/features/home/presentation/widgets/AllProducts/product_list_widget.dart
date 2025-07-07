@@ -22,16 +22,52 @@ class ProductListWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is ProductLoaded) {
           final products = state.products;
+
           if (products.isEmpty) {
             return const Center(child: Text('No products available'));
           }
 
-          final displayProducts = showAll ? products : products.take(10).toList();
+          // If showAll is true, show all products in a list or grid (adjust as needed)
+          if (showAll) {
+            return GridView.builder(
+              padding: const EdgeInsets.all(12),
+              shrinkWrap: true,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: products.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.75,
+              ),
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return ProductItemCard(
+                  product: product,
+                  onAddToCart: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${product.name} added to cart!')),
+                    );
+                  },
+                  onViewDetail: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/product-detail',
+                      arguments: product,
+                    );
+                  },
+                );
+              },
+            );
+          }
+
+          // When showAll is false, show max 4 items in 2x2 grid
+          final displayProducts = products.length > 4 ? products.sublist(0, 4) : products;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title + View All
+              // Title + View All button if more than 4 products
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
                 child: Row(
@@ -41,41 +77,47 @@ class ProductListWidget extends StatelessWidget {
                       "All Products",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    if (!showAll && products.length > 10)
+                    if (products.length > 4)
                       TextButton(
-                        onPressed: onViewAll,
+                        onPressed: onViewAll ??
+                            () {
+                              // default action: navigate to a route named '/products' or whatever you have
+                              Navigator.pushNamed(context, '/products');
+                            },
                         child: const Text("View All"),
                       ),
                   ],
                 ),
               ),
 
-              SizedBox(
-                height: 255,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: displayProducts.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.75,
+                  ),
                   itemBuilder: (context, index) {
                     final product = displayProducts[index];
-                    return SizedBox(
-                      width: 200,
-                      child: ProductItemCard(
-                        product: product,
-                        onAddToCart: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${product.name} added to cart!')),
-                          );
-                        },
-                        onViewDetail: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/product-detail',
-                            arguments: product,
-                          );
-                        },
-                      ),
+                    return ProductItemCard(
+                      product: product,
+                      onAddToCart: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${product.name} added to cart!')),
+                        );
+                      },
+                      onViewDetail: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/product-detail',
+                          arguments: product,
+                        );
+                      },
                     );
                   },
                 ),
