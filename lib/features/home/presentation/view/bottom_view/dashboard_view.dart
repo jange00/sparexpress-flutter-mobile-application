@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
+import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_event.dart';
 import 'package:sparexpress/features/home/presentation/widgets/banners/banner_slider.dart';
-import 'package:sparexpress/features/home/presentation/widgets/products/product_list_widget.dart';
+import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_list_widget.dart';
+import 'package:sparexpress/features/home/presentation/widgets/category/category_list_widget.dart';
 // import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
 
 class DashboardView extends StatelessWidget {
@@ -32,6 +35,15 @@ class DashboardView extends StatelessWidget {
               BannerSliderWidget(
                 bannerImages: const ['assets/images/banner1.png','assets/images/wire.jpg'],
               ),
+
+             const SizedBox(height: 12),
+
+              BlocProvider<CategoryBloc>(
+                create: (_) =>
+                    serviceLocator<CategoryBloc>()..add(LoadCategories()),
+                child: const CategoryListWidget(),
+              ),
+
               const SizedBox(height: 12),
 
               BlocProvider<ProductBloc>(

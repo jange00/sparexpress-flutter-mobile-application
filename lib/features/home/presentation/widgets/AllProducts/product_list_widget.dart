@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_state.dart';
-import 'package:sparexpress/features/home/presentation/widgets/products/product_item_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
 
 class ProductListWidget extends StatelessWidget {
   final bool showAll;
@@ -56,7 +56,7 @@ class ProductListWidget extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   itemCount: displayProducts.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     final product = displayProducts[index];
                     return SizedBox(

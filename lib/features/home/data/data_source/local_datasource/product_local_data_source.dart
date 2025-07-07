@@ -1,7 +1,7 @@
 import 'package:sparexpress/core/error/failure.dart';
 import 'package:sparexpress/core/network/hive_service.dart';
 import 'package:sparexpress/features/home/data/data_source/product_data_source.dart';
-import 'package:sparexpress/features/home/data/model/product_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/all_product/product_hive_model.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 
 class ProductLocalDataSource implements IProductDataSource {

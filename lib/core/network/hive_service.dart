@@ -2,7 +2,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sparexpress/app/constant/hive_table_constant.dart';
 import 'package:sparexpress/features/auth/data/model/customer_hive_model.dart';
-import 'package:sparexpress/features/home/data/model/product_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/all_product/product_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/category/category_hive_model.dart';
 
 class HiveService {
   Future<void> init() async {
@@ -14,6 +15,7 @@ class HiveService {
     // Register Hive Adapters
     Hive.registerAdapter(CustomerHiveModelAdapter());
     Hive.registerAdapter(ProductHiveModelAdapter());
+    Hive.registerAdapter(CategoryHiveModelAdapter());
   }
 
   Future<void> close() async {
@@ -97,38 +99,73 @@ class HiveService {
   }
 
   /// Dummy Data (with new titles)
-  Future<void> addDummyProductData() async {
-    final product1 = ProductHiveModel(
-      name: 'Brake Pad',
-      categoryId: 'cat1',
-      categoryTitle: 'Car Parts',
-      subCategoryId: 'sub1',
-      subCategoryTitle: 'Brakes',
-      brandId: 'brand1',
-      brandTitle: 'Bosch',
-      price: 500.0,
-      image: ['https://example.com/brake_pad.jpg'],
-      stock: 15,
-      shippingCharge: 50.0,
-      discount: 10.0,
-    );
+  // Future<void> addDummyProductData() async {
+  //   final product1 = ProductHiveModel(
+  //     name: 'Brake Pad',
+  //     categoryId: 'cat1',
+  //     categoryTitle: 'Car Parts',
+  //     subCategoryId: 'sub1',
+  //     subCategoryTitle: 'Brakes',
+  //     brandId: 'brand1',
+  //     brandTitle: 'Bosch',
+  //     price: 500.0,
+  //     image: ['https://example.com/brake_pad.jpg'],
+  //     stock: 15,
+  //     shippingCharge: 50.0,
+  //     discount: 10.0,
+  //   );
 
-    final product2 = ProductHiveModel(
-      name: 'Air Filter',
-      categoryId: 'cat2',
-      categoryTitle: 'Car Parts',
-      subCategoryId: 'sub2',
-      subCategoryTitle: 'Filter',
-      brandId: 'brand2',
-      brandTitle: 'Philips',
-      price: 300.0,
-      image: ['https://example.com/air_filter.jpg'],
-      stock: 30,
-      shippingCharge: 30.0,
-      discount: 0.0,
-    );
+  //   final product2 = ProductHiveModel(
+  //     name: 'Air Filter',
+  //     categoryId: 'cat2',
+  //     categoryTitle: 'Car Parts',
+  //     subCategoryId: 'sub2',
+  //     subCategoryTitle: 'Filter',
+  //     brandId: 'brand2',
+  //     brandTitle: 'Philips',
+  //     price: 300.0,
+  //     image: ['https://example.com/air_filter.jpg'],
+  //     stock: 30,
+  //     shippingCharge: 30.0,
+  //     discount: 0.0,
+  //   );
 
-    await addProduct(product1);
-    await addProduct(product2);
+  //   await addProduct(product1);
+  //   await addProduct(product2);
+  // }
+
+  // ======================
+  // Category Queries
+  // ======================
+
+  Future<void> addCategory(CategoryHiveModel category) async {
+    final box = await Hive.openBox<CategoryHiveModel>(
+      HiveTableConstant.categoryBox,
+    );
+    await box.put(category.categoryId, category);
   }
+
+  Future<void> deleteCategory(String id) async {
+    final box = await Hive.openBox<CategoryHiveModel>(
+      HiveTableConstant.categoryBox,
+    );
+    await box.delete(id);
+  }
+
+  Future<List<CategoryHiveModel>> getAllCategories() async {
+    final box = await Hive.openBox<CategoryHiveModel>(
+      HiveTableConstant.categoryBox,
+    );
+    final categories = box.values.toList();
+    categories.sort((a, b) => a.categoryTitle.compareTo(b.categoryTitle));
+    return categories;
+  }
+
+  Future<CategoryHiveModel?> getCategoryById(String id) async {
+    final box = await Hive.openBox<CategoryHiveModel>(
+      HiveTableConstant.categoryBox,
+    );
+    return box.get(id);
+  }
+
 }

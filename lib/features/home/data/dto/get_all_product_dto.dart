@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sparexpress/features/home/data/model/product_api_model.dart';
+import 'package:sparexpress/features/home/data/model/all_product/product_api_model.dart';
 
 // dart run build_runner build -d
 part 'get_all_product_dto.g.dart';

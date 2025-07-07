@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/core/network/api_service.dart';
-import 'package:sparexpress/features/home/data/dto/get_all_product_dto.dart';
-import 'package:sparexpress/features/home/data/model/product_api_model.dart';
+// import 'package:sparexpress/features/home/data/dto/get_all_product_dto.dart';
+import 'package:sparexpress/features/home/data/model/all_product/product_api_model.dart';
 import 'package:sparexpress/features/home/data/data_source/product_data_source.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 

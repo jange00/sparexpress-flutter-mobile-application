@@ -26,4 +26,8 @@ class ApiEndpoints {
   // Products
   static const String getAllProducts = "admin/products";
   static const String getProductsById = "admin/products/:id";
+
+  // Category
+  static const String getAllCategory = "admin/categories";
+  static const String getAllCategoryById = "admin/categories/:id";
 }
