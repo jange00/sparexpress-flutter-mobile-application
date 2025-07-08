@@ -12,6 +12,7 @@ import 'package:sparexpress/features/home/presentation/widgets/AllProducts/produ
 import 'package:sparexpress/features/home/presentation/widgets/category/category_list_widget.dart';
 import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_list_widget.dart';
 // import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
+// import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -27,7 +28,7 @@ class DashboardView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Uncomment if you want to use SearchBar
+              // SearchBar
               // SearchBarWidget(
               //   controller: searchController,
               //   onSearch: (query) {

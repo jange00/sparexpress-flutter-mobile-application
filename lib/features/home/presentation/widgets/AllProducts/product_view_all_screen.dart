@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
 
-class ProductViewAllScreen extends StatelessWidget {
+class ProductViewAllScreen extends StatefulWidget {
   const ProductViewAllScreen({super.key});
 
+  @override
+  State<ProductViewAllScreen> createState() => _ProductViewAllScreenState();
+}
+
+class _ProductViewAllScreenState extends State<ProductViewAllScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<ProductBloc>().add(LoadProducts());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_view_all_screen.dart';
 
 class ProductListWidget extends StatelessWidget {
   final bool showAll;
-  final VoidCallback? onViewAll;
 
   const ProductListWidget({
     super.key,
     this.showAll = false,
-    this.onViewAll,
   });
 
   @override
@@ -22,52 +22,16 @@ class ProductListWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is ProductLoaded) {
           final products = state.products;
-
           if (products.isEmpty) {
             return const Center(child: Text('No products available'));
           }
 
-          // If showAll is true, show all products in a list or grid (adjust as needed)
-          if (showAll) {
-            return GridView.builder(
-              padding: const EdgeInsets.all(12),
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: products.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.75,
-              ),
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return ProductItemCard(
-                  product: product,
-                  onAddToCart: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${product.name} added to cart!')),
-                    );
-                  },
-                  onViewDetail: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/product-detail',
-                      arguments: product,
-                    );
-                  },
-                );
-              },
-            );
-          }
-
-          // When showAll is false, show max 4 items in 2x2 grid
-          final displayProducts = products.length > 4 ? products.sublist(0, 4) : products;
+          final displayProducts = showAll ? products : products.take(4).toList();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title + View All button if more than 4 products
+              // Title + View All
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
                 child: Row(
@@ -77,13 +41,16 @@ class ProductListWidget extends StatelessWidget {
                       "All Products",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    if (products.length > 4)
+                    if (!showAll && products.length > 4)
                       TextButton(
-                        onPressed: onViewAll ??
-                            () {
-                              // default action: navigate to a route named '/products' or whatever you have
-                              Navigator.pushNamed(context, '/products');
-                            },
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BlocProvider.value(value: serviceLocator<ProductBloc>(),child: ProductViewAllScreen(),),
+                            ),
+                          );
+                        },
                         child: const Text("View All"),
                       ),
                   ],
