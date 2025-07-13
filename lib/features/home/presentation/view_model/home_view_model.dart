@@ -14,6 +14,11 @@ class HomeViewModel extends Cubit<HomeState> {
     emit(state.copyWith(selectedIndex: index));
   }
 
+   void setUserName(String name) {
+    emit(state.copyWith(fullname: name));
+  }
+
+
   void logout(BuildContext context) {
     Future.delayed(const Duration(seconds: 2), () async{
       if(context.mounted) {

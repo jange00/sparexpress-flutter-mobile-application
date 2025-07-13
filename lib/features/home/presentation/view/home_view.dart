@@ -1,51 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:sparexpress/features/home/presentation/view/bottom_view/dashboard_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/dashboard_header/custom_dashboard_appbar.dart';
+import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
-  final bool _isDarkTheme = false;
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
 
-@override
+class _HomeViewState extends State<HomeView> {
+  TextEditingController? _searchController;
+
+  @override
+  void dispose() {
+    _searchController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Text.rich(
-          TextSpan(
-            text: "Spare",
-            style: GoogleFonts.montserrat(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+    return BlocBuilder<HomeViewModel, HomeState>(
+      builder: (context, state) {
+        final fullname = state.fullname;
+
+        // Initialize controller only for dashboard
+        if (state.selectedIndex == 0 && _searchController == null) {
+          _searchController = TextEditingController();
+        } else if (state.selectedIndex != 0 && _searchController != null) {
+          _searchController!.dispose();
+          _searchController = null;
+        }
+
+        Widget bodyWidget;
+        switch (state.selectedIndex) {
+          case 0:
+            bodyWidget = const DashboardView();
+            break;
+          case 1:
+            bodyWidget = const Center(child: Text('Order Page'));
+            break;
+          case 2:
+            bodyWidget = const Center(child: Text('Cart Page'));
+            break;
+          case 3:
+            bodyWidget = const Center(child: Text('Account Page'));
+            break;
+          default:
+            bodyWidget = const DashboardView();
+        }
+
+        return Scaffold(
+          appBar: state.selectedIndex == 0
+              ? CustomDashboardAppBar(fullname: fullname)
+              : null,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              children: [
+                // Conditionally show search bar only on dashboard
+                if (state.selectedIndex == 0 && _searchController != null) ...[
+                  SearchBarWidget(
+                    controller: _searchController!,
+                    onSearch: (query) {
+                      print('Searching: $query');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
+                Expanded(child: bodyWidget),
+              ],
             ),
-            children: const [
-              TextSpan(
-                text: "Xpress",
-                style: TextStyle(color: Color(0xFFFFC107)),
-              ),
-            ],
           ),
-        ),
-      ),
-      body: BlocBuilder<HomeViewModel, HomeState>(
-        builder: (context, state) {
-          return state.views.elementAt(state.selectedIndex);
-        },
-      ),
-      bottomNavigationBar: BlocBuilder<HomeViewModel, HomeState>(
-        builder: (context, state) {
-          return BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
+          bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.dashboard),
-                label: "Dashboard",
+                label: 'Dashboard',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.receipt_long),
@@ -62,12 +99,13 @@ class HomeView extends StatelessWidget {
             ],
             currentIndex: state.selectedIndex,
             selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.black,
             onTap: (index) {
               context.read<HomeViewModel>().onTapped(index);
             },
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

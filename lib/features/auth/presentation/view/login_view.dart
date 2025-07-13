@@ -14,8 +14,8 @@ class LoginView extends StatelessWidget {
   LoginView({super.key});
 
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'sushant@gmail.com');
-  final _passwordController = TextEditingController(text: '12345678');
+  final _emailController = TextEditingController(text: '');
+  final _passwordController = TextEditingController(text: '');
   final ValueNotifier<bool> _rememberMe = ValueNotifier(false);
 
   final _gap = const SizedBox(height: 20);
