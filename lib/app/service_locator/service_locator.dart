@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sparexpress/app/shared_pref/token_shared_prefs.dart';
 import 'package:sparexpress/core/network/api_service.dart';
 import 'package:sparexpress/core/network/hive_service.dart';
 import 'package:sparexpress/features/auth/data/data_source/local_datasource/customer_local_data_source.dart';
@@ -41,6 +43,7 @@ final serviceLocator = GetIt.instance;
 Future<void> initDependencies() async {
   await _initHiveService();
   await initApiModule();
+ await  _initSharedPrefs();
 
   // Initialize all modules
   await _initAuthModule();
@@ -59,6 +62,16 @@ Future<void> initApiModule() async {
   // Dio instance
   serviceLocator.registerLazySingleton<Dio>(() => Dio());
   serviceLocator.registerLazySingleton(() => ApiService(serviceLocator<Dio>()));
+}
+
+Future <void> _initSharedPrefs() async{
+  final sharedPrefs = await SharedPreferences.getInstance();
+  serviceLocator.registerLazySingleton(() => sharedPrefs);
+  serviceLocator.registerLazySingleton(
+    () => TokenSharedPrefs(
+      sharedPreferences: serviceLocator<SharedPreferences>(),
+  ),
+  );
 }
 
 
@@ -83,6 +96,7 @@ Future <void> _initAuthModule() async {
   serviceLocator.registerLazySingleton<CustomerLoginUseCase>(
     () => CustomerLoginUseCase(
       customerRepository: serviceLocator<CustomerRemoteRepository>(),
+      tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
     ),
   );
 
