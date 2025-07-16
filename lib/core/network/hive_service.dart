@@ -3,6 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sparexpress/app/constant/hive_table_constant.dart';
 import 'package:sparexpress/features/auth/data/model/customer_hive_model.dart';
 import 'package:sparexpress/features/home/data/model/all_product/product_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/cart/cart_hive_model.dart';
 import 'package:sparexpress/features/home/data/model/category/category_hive_model.dart';
 
 class HiveService {
@@ -167,5 +168,41 @@ class HiveService {
     );
     return box.get(id);
   }
+
+  // ======================
+// Cart Queries
+// ======================
+
+Future<void> addCart(CartHiveModel cart) async {
+  final box = await Hive.openBox<CartHiveModel>(
+    HiveTableConstant.cartBox,
+  );
+  await box.put(cart.id, cart);
+}
+
+Future<void> deleteCart(String id) async {
+  final box = await Hive.openBox<CartHiveModel>(
+    HiveTableConstant.cartBox,
+  );
+  await box.delete(id);
+}
+
+Future<List<CartHiveModel>> getAllCarts() async {
+  final box = await Hive.openBox<CartHiveModel>(
+    HiveTableConstant.cartBox,
+  );
+  final carts = box.values.toList();
+  // Optional: sort if needed, e.g., by userId or createdAt if you have such fields
+  // carts.sort((a, b) => a.userId.compareTo(b.userId));
+  return carts;
+}
+
+Future<CartHiveModel?> getCartById(String id) async {
+  final box = await Hive.openBox<CartHiveModel>(
+    HiveTableConstant.cartBox,
+  );
+  return box.get(id);
+}
+
 
 }

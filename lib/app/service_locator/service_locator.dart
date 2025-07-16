@@ -12,17 +12,23 @@ import 'package:sparexpress/features/auth/domain/use_case/customer_login_usecase
 import 'package:sparexpress/features/auth/domain/use_case/customer_register_usecase.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
+import 'package:sparexpress/features/home/data/data_source/remote_datasource/cart_remote_data_source.dart';
 // import 'package:sparexpress/features/home/data/data_source/local_datasource/category_local_data_source.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/category_remote_data_source.dart';
 // import 'package:sparexpress/features/home/data/data_source/local_datasource/product_local_data_source.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/product_remote_data_source.dart';
+// import 'package:sparexpress/features/home/data/repository/local_repository/cart_local_repository.dart';
+import 'package:sparexpress/features/home/data/repository/remote_repository/cart_remote_repostiory.dart';
 // import 'package:sparexpress/features/home/data/repository/local_repository/category_local_repository.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/category_remote_repository.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/product_remote_repository.dart';
+import 'package:sparexpress/features/home/domin/repository/cart_repository.dart';
 import 'package:sparexpress/features/home/domin/repository/category_repository.dart';
 import 'package:sparexpress/features/home/domin/repository/products_repository.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/get_all_product_usecase.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
@@ -42,6 +48,7 @@ Future<void> initDependencies() async {
   await _initSplashModule();
   await _initProductModule();
   await _initCategoryModule();
+  await _initCartModule();
 }
 
 Future<void> _initHiveService() async {
@@ -147,6 +154,29 @@ serviceLocator.registerFactory<ProductBloc>(
 serviceLocator.registerFactory<OfferBloc>(
   () => OfferBloc(getAllProductUsecase: serviceLocator<GetAllProductUsecase>()),
 );
+}
+
+// Cart
+Future<void> _initCartModule() async {
+  // Remote Data Source
+  serviceLocator.registerFactory<ICartRemoteDataSource>(
+    () => CartRemoteDataSource(apiService: serviceLocator<ApiService>()),
+  );
+
+  // Repository
+  serviceLocator.registerFactory<ICartRepository>(
+    () => CartRemoteRepository(cartRemoteDataSource: serviceLocator<ICartRemoteDataSource>()),
+  );
+
+  // UseCase
+  serviceLocator.registerFactory<GetAllCartUsecase>(
+    () => GetAllCartUsecase(cartRepository: serviceLocator<ICartRepository>()),
+  );
+
+  // Bloc
+  serviceLocator.registerFactory<CartBloc>(
+    () => CartBloc(getAllCartUsecase: serviceLocator<GetAllCartUsecase>()),
+  );
 }
 
 

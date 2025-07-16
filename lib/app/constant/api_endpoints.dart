@@ -30,4 +30,11 @@ class ApiEndpoints {
   // Category
   static const String getAllCategory = "admin/categories";
   static const String getAllCategoryById = "admin/categories/:id";
+
+  // Cart
+ static const String createCart = "cart/";
+ static const String getCartByUser = "cart/user"; 
+//  static const String deleteCart = "cart/item/:cartItemId";
+static const String deleteCart = "cart/item/:cartItemId"; 
+  static const String clearCartByUser = "cart/clear/:userId";
 }
