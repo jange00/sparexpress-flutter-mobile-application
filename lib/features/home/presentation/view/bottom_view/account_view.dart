@@ -6,6 +6,8 @@ import 'package:sparexpress/features/home/presentation/view_model/account/accoun
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/about_us/about_us_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/change_password/change_password_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/change_password/change_password_overlay.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/contact_us/contact_us_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/contact_us/contact_us_overlay.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/logout/logout_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/profile_header/profile_header_card.dart';
 
@@ -25,7 +27,7 @@ class AccountView extends StatelessWidget {
         listener: (context, state) {
           if (state is LogoutConfirmed) {
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) =>  LoginView()),
+              MaterialPageRoute(builder: (_) => LoginView()),
               (route) => false,
             );
           }
@@ -40,10 +42,7 @@ class AccountView extends StatelessWidget {
                 children: [
                   const Text(
                     "Settings",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 20),
                   ProfileHeaderCard(
@@ -53,21 +52,32 @@ class AccountView extends StatelessWidget {
                     imageUrl: imageUrl,
                   ),
                   const SizedBox(height: 16),
-    ChangePasswordCard(
-      onTap: () {
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (_) => const ChangePasswordOverlay(),
-        );
-      },
-    ),
-                     const SizedBox(height: 16),
+                  ChangePasswordCard(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (_) => const ChangePasswordOverlay(),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  ContactUsCard(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        // We don't want the user to accidentally dismiss it while typing or loading
+                        barrierDismissible: false,
+                        builder: (context) => const ContactUsOverlay(),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   // Expanded(child: const AboutUsCard()),
                   const AboutUsCard(),
                   const SizedBox(height: 16),
-                  const LogoutCard(),  
-                
+                  const LogoutCard(),
                 ],
               ),
             ),

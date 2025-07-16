@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view/bottom_view/account_view.dart';
+import 'package:sparexpress/features/home/presentation/view/bottom_view/cart_view.dart';
 import 'package:sparexpress/features/home/presentation/view/bottom_view/dashboard_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_state.dart';
@@ -47,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
             bodyWidget = const Center(child: Text('Order Page'));
             break;
           case 2:
-            bodyWidget = const Center(child: Text('Cart Page'));
+            bodyWidget = const CartView();
             break;
           case 3:
             bodyWidget = const AccountView();
