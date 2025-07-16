@@ -62,7 +62,7 @@ class DashboardView extends StatelessWidget {
                           ..add(const LoadProducts()),
                 child: Container(
                   color: Colors.white.withOpacity(0.1),
-                  child: const ProductListWidget(),
+                  child: ProductListWidget(),
                 ),
               ),
 

@@ -17,6 +17,7 @@ class LoginView extends StatelessWidget {
   final _emailController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
   final ValueNotifier<bool> _rememberMe = ValueNotifier(false);
+  final ValueNotifier<bool> _showPassword = ValueNotifier(false);
 
   final _gap = const SizedBox(height: 20);
 
@@ -98,27 +99,39 @@ class LoginView extends StatelessWidget {
                         },
                       ),
                       _gap,
-                      TextFormField(
-                        key: const ValueKey('password'),
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: const TextStyle(color: Colors.grey),
-                          filled: true,
-                          fillColor: Colors.grey.shade100,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter password';
-                          }
-                          return null;
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _showPassword,
+                        builder: (context, show, _) {
+                          return TextFormField(
+                            key: const ValueKey('password'),
+                            controller: _passwordController,
+                            obscureText: !show,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              labelStyle: const TextStyle(color: Colors.grey),
+                              filled: true,
+                              fillColor: Colors.grey.shade100,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  show ? Icons.visibility : Icons.visibility_off,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () => _showPassword.value = !show,
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter password';
+                              }
+                              return null;
+                            },
+                          );
                         },
                       ),
                       const SizedBox(height: 12),

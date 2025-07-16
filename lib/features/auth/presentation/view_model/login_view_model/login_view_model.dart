@@ -11,6 +11,7 @@ import 'package:sparexpress/features/auth/presentation/view_model/login_view_mod
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view/home_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
+import 'package:sparexpress/app/constant/theme_constant.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState>{
   final CustomerLoginUseCase _customerLoginUseCase;
@@ -84,16 +85,26 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
       (token) {
         // Handle success case
         emit(state.copyWith(isLoading: false, isSuccess: true));
-              Navigator.pushReplacement(
-        event.context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: serviceLocator<HomeViewModel>(),
-            child: const HomeView(),
+        Navigator.pushReplacement(
+          event.context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider.value(
+              value: serviceLocator<HomeViewModel>(),
+              child: const HomeView(),
+            ),
           ),
-        ),
-      );
-        // add(NavigateToHomeViewEvent(context: event.context));
+        );
+        // Show success toast after navigation
+        Future.delayed(const Duration(milliseconds: 300), () {
+          ScaffoldMessenger.of(event.context).showSnackBar(
+            SnackBar(
+              content: const Text('Login successful!'),
+              backgroundColor: ThemeConstant.primaryColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        });
       },
     );
   }

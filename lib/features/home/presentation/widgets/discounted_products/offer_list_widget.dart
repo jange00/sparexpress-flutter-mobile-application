@@ -6,6 +6,8 @@ import 'package:sparexpress/features/home/presentation/view_model/dashboard/dico
 // import 'package:sparexpress/features/home/presentation/widgets/discounted_products/OfferViewAllScreen.dart';
 import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_view_all_screen.dart';
 import 'offer_item_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/product_detail/product_detail_view.dart';
+import 'package:shimmer/shimmer.dart';
 
 class OfferListWidget extends StatelessWidget {
   final VoidCallback? onViewAll;
@@ -17,7 +19,72 @@ class OfferListWidget extends StatelessWidget {
     return BlocBuilder<OfferBloc, OfferState>(
       builder: (context, state) {
         if (state is OfferLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 4,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.7,
+              ),
+              itemBuilder: (context, index) {
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 170,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withOpacity(0.13),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            height: 100,
+                            width: double.infinity,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          height: 16,
+                          width: 100,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          height: 14,
+                          width: 60,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 28,
+                          width: 80,
+                          color: Colors.grey[300],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
         } else if (state is OfferLoaded) {
           final discountedProducts = state.discountedProducts;
 
@@ -94,7 +161,13 @@ class OfferListWidget extends StatelessWidget {
                       return OfferItemCard(
                         product: product,
                         onTap: () {
-                          debugPrint("Tapped on ${product.name}");
+                          debugPrint('Tapped special offer: ${product.name}');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductDetailView(product: product),
+                            ),
+                          );
                         },
                       );
                     },

@@ -4,16 +4,25 @@ import 'package:dartz/dartz.dart';
 import 'package:sparexpress/features/auth/domain/use_case/customer_login_usecase.dart';
 import 'package:sparexpress/features/auth/domain/repository/customer_repository.dart';
 import 'package:sparexpress/core/error/failure.dart';
+import 'package:sparexpress/app/shared_pref/token_shared_prefs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockICustomerRepository extends Mock implements ICustomerRepository {}
+class MockTokenSharedPrefs extends Mock implements TokenSharedPrefs {}
 
 void main() {
   late CustomerLoginUseCase useCase;
   late MockICustomerRepository mockRepository;
+  late MockTokenSharedPrefs mockTokenSharedPrefs;
 
   setUp(() {
     mockRepository = MockICustomerRepository();
-    useCase = CustomerLoginUseCase(customerRepository: mockRepository);
+    mockTokenSharedPrefs = MockTokenSharedPrefs();
+    when(() => mockTokenSharedPrefs.saveToken(any())).thenAnswer((_) async => const Right(null));
+    useCase = CustomerLoginUseCase(
+      customerRepository: mockRepository,
+      tokenSharedPrefs: mockTokenSharedPrefs,
+    );
   });
 
   const testEmail = 'test@example.com';

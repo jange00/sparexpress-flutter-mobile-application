@@ -5,6 +5,7 @@ import 'package:sparexpress/features/home/presentation/view_model/dashboard/prod
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_view_all_screen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductListWidget extends StatelessWidget {
   final bool showAll;
@@ -19,7 +20,72 @@ class ProductListWidget extends StatelessWidget {
     return BlocBuilder<ProductBloc, ProductState>(
       builder: (context, state) {
         if (state is ProductLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 4,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.75,
+              ),
+              itemBuilder: (context, index) {
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 170,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withOpacity(0.13),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            height: 90,
+                            width: double.infinity,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          height: 16,
+                          width: 100,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 2),
+                        Container(
+                          height: 14,
+                          width: 60,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 28,
+                          width: 80,
+                          color: Colors.grey[300],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
         } else if (state is ProductLoaded) {
           final products = state.products;
           if (products.isEmpty) {
