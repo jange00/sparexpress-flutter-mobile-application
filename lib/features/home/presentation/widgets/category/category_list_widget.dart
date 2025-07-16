@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_state.dart';
 
 class CategoryListWidget extends StatelessWidget {
   const CategoryListWidget({super.key});

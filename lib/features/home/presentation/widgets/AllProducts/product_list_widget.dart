@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_view_all_screen.dart';
 

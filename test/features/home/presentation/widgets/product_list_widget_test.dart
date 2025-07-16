@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_list_widget.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 

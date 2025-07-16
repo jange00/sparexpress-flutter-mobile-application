@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view/bottom_view/account_view.dart';
 import 'package:sparexpress/features/home/presentation/view/bottom_view/dashboard_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_state.dart';
+// import 'package:sparexpress/features/home/presentation/widgets/dashboard/dashboard_header/custom_dashboard_appbar.dart';
 import 'package:sparexpress/features/home/presentation/widgets/dashboard_header/custom_dashboard_appbar.dart';
 import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
 
@@ -48,7 +50,7 @@ class _HomeViewState extends State<HomeView> {
             bodyWidget = const Center(child: Text('Cart Page'));
             break;
           case 3:
-            bodyWidget = const Center(child: Text('Account Page'));
+            bodyWidget = const AccountView();
             break;
           default:
             bodyWidget = const DashboardView();
@@ -59,7 +61,7 @@ class _HomeViewState extends State<HomeView> {
               ? CustomDashboardAppBar(fullname: fullname)
               : null,
           body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             child: Column(
               children: [
                 // Conditionally show search bar only on dashboard

@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_item_card.dart';
 // import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
 // import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_event.dart';
-import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_item_card.dart';
+// import 'package:sparexpress/features/home/presentation/widgets/dashboard/discounted_products/offer_item_card.dart';
 
 class OfferViewAllScreen extends StatefulWidget {
   const OfferViewAllScreen({super.key});

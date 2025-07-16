@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_list_widget.dart';
-import 'package:sparexpress/features/home/presentation/view_model/dicounted_products_view_model/offer_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/dicounted_products_view_model/offer_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_state.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 
 class MockOfferBloc extends Mock implements OfferBloc {}

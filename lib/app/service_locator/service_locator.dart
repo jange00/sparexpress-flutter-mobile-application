@@ -23,10 +23,11 @@ import 'package:sparexpress/features/home/domin/repository/category_repository.d
 import 'package:sparexpress/features/home/domin/repository/products_repository.dart';
 import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/get_all_product_usecase.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/dicounted_products_view_model/offer_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 
 final serviceLocator = GetIt.instance;
@@ -106,6 +107,11 @@ Future <void> _initAuthModule() async {
   serviceLocator.registerFactory(
     () => LoginViewModel(serviceLocator<CustomerLoginUseCase>()),
   );
+  
+  // Profile account
+  serviceLocator.registerFactory(() => ProfileBloc(
+  getCurrentCustomer: serviceLocator<CustomerGetCurrentUseCase>(),
+));
 }
 
 // Home

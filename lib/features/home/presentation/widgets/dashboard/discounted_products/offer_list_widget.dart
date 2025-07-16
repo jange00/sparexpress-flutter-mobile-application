@@ -4,8 +4,9 @@ import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_state.dart';
 // import 'package:sparexpress/features/home/presentation/widgets/discounted_products/OfferViewAllScreen.dart';
-import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_view_all_screen.dart';
-import 'offer_item_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/dashboard/discounted_products/offer_view_all_screen.dart';
+import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_item_card.dart';
+// import 'offer_item_card.dart';
 
 class OfferListWidget extends StatelessWidget {
   final VoidCallback? onViewAll;

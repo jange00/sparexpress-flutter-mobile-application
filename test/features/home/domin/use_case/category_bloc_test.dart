@@ -1,9 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_event.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_state.dart';
 import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
 import 'package:sparexpress/features/home/domin/entity/category_entity.dart';
 import 'package:dartz/dartz.dart';
