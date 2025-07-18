@@ -1,13 +1,14 @@
 import 'package:dartz/dartz.dart';
 import 'package:sparexpress/app/use_case/usecase.dart';
 import 'package:sparexpress/core/error/failure.dart';
+import 'package:sparexpress/features/home/data/repository/remote_repository/cart_remote_repostiory.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:sparexpress/features/home/domin/repository/cart_repository.dart';
 
 class GetAllCartUsecase implements UseCaseWithoutParams<List<CartEntity>> {
-  final ICartRepository _cartRepository;
+  final CartRemoteRepository _cartRepository;
 
-  GetAllCartUsecase({required ICartRepository cartRepository})
+  GetAllCartUsecase({required CartRemoteRepository cartRepository})
       : _cartRepository = cartRepository;
 
   @override

@@ -6,16 +6,16 @@ import 'package:sparexpress/features/home/domin/repository/cart_repository.dart'
 
 
 class CartRemoteRepository implements ICartRepository {
-  final ICartRemoteDataSource _cartRemoteDataSource;
+  final CartRemoteDataSource _cartRemoteDataSource;
 
   CartRemoteRepository({
-    required ICartRemoteDataSource cartRemoteDataSource,
+    required CartRemoteDataSource cartRemoteDataSource,
   }) : _cartRemoteDataSource = cartRemoteDataSource;
 
   @override
   Future<Either<Failure, List<CartEntity>>> getCartByUserId(String userId) async {
     try {
-      final cartItems = await _cartRemoteDataSource.getCartByUserId(userId);
+      final cartItems = await _cartRemoteDataSource.getCartByUserId();
       return Right(cartItems);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));
@@ -43,8 +43,12 @@ class CartRemoteRepository implements ICartRepository {
   }
   
   @override
-  Future<Either<Failure, List<CartEntity>>> getCarts() {
-    // TODO: implement getCarts
-    throw UnimplementedError();
+  Future<Either<Failure, List<CartEntity>>> getCarts() async {
+    try {
+      final cartItems = await _cartRemoteDataSource.getCartByUserId();
+      return Right(cartItems);
+    } catch (e) {
+      return Left(RemoteDatabaseFailure(message: e.toString()));
+    }
   }
 }

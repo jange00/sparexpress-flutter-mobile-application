@@ -59,7 +59,7 @@ class _HomeViewState extends State<HomeView> {
 
         return Scaffold(
           appBar: state.selectedIndex == 0
-              ? CustomDashboardAppBar(fullname: fullname)
+              ? CustomDashboardAppBar()
               : null,
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),

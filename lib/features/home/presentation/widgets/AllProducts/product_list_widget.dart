@@ -5,6 +5,11 @@ import 'package:sparexpress/features/home/presentation/view_model/dashboard/prod
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_view_all_screen.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_state.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductListWidget extends StatelessWidget {
@@ -140,6 +145,27 @@ class ProductListWidget extends StatelessWidget {
                     return ProductItemCard(
                       product: product,
                       onAddToCart: () {
+                        // Get userId from ProfileBloc if available
+                        String userId = '';
+                        final profileState = context.read<ProfileBloc>().state;
+                        if (profileState is ProfileLoaded) {
+                          userId = profileState.customer.customerId ?? '';
+                        } else {
+                          // Optionally, show a message or fetch profile
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('User not loaded. Please wait...')),
+                          );
+                          return;
+                        }
+                        final cartEntity = CartEntity(
+                          userId: userId,
+                          productId: product.productId ?? '',
+                          name: product.name,
+                          imageUrl: product.image.isNotEmpty ? 'http://localhost:3000/${product.image.first}' : '',
+                          price: product.price,
+                          quantity: 1,
+                        );
+                        context.read<CartBloc>().add(CreateCart(cartEntity));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('${product.name} added to cart!')),
                         );

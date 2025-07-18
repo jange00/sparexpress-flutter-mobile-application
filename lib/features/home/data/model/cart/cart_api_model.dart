@@ -77,6 +77,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 
 part 'cart_api_model.g.dart';
 
@@ -97,8 +98,14 @@ class CartApiModel extends Equatable {
   });
 
   /// JSON serialization
-  factory CartApiModel.fromJson(Map<String, dynamic> json) =>
-      _$CartApiModelFromJson(json);
+  factory CartApiModel.fromJson(Map<String, dynamic> json) {
+    return CartApiModel(
+      id: json['_id'] as String?,
+      userId: json['userId'] as String? ?? '',
+      productId: ProductInfo.fromJson(json['productId'] as Map<String, dynamic>),
+      quantity: json['quantity'] == null ? 1 : (json['quantity'] as num).toInt(),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$CartApiModelToJson(this);
 
@@ -157,8 +164,29 @@ class ProductInfo extends Equatable {
     required this.price,
   });
 
-  factory ProductInfo.fromJson(Map<String, dynamic> json) =>
-      _$ProductInfoFromJson(json);
+  factory ProductInfo.fromJson(Map<String, dynamic> json) {
+    // Handle image field: could be a list or a string, or missing
+    String imageUrl = '';
+    if (json['imageUrl'] != null) {
+      imageUrl = json['imageUrl'] as String;
+    } else if (json['image'] != null && json['image'] is List && (json['image'] as List).isNotEmpty) {
+      imageUrl = (json['image'] as List).first.toString();
+    }
+    // Prepend base URL if imageUrl is a relative path
+    if (imageUrl.isNotEmpty && !imageUrl.startsWith('http')) {
+      imageUrl = ApiEndpoints.imagrUrl + imageUrl.replaceFirst(RegExp(r'^uploads/'), '');
+    }
+    double price = 0.0;
+    if (json['price'] != null) {
+      price = (json['price'] as num).toDouble();
+    }
+    return ProductInfo(
+      id: json['_id'] as String?,
+      name: json['name'] as String? ?? '',
+      imageUrl: imageUrl,
+      price: price,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$ProductInfoToJson(this);
 

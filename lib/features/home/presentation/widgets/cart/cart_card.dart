@@ -34,18 +34,26 @@ class CartCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.grey.shade100,
+                image: item.imageUrl.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(item.imageUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              child: const Icon(Icons.shopping_cart, size: 40, color: Colors.grey),
+              child: item.imageUrl.isEmpty
+                  ? const Icon(Icons.shopping_cart, size: 40, color: Colors.grey)
+                  : null,
             ),
             const SizedBox(width: 14),
 
-            // Product Info Placeholder
+            // Product Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Product ID: ${item.productId}',
+                    item.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
@@ -53,10 +61,14 @@ class CartCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  // You can add price or quantity here if available in your CartEntity
-                  const Text(
-                    'Quantity: 1', // Update when quantity added to CartEntity
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  Text(
+                    'Price: ₹${item.price.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Quantity: ${item.quantity}',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),

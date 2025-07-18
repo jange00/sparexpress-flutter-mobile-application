@@ -9,6 +9,7 @@
 
 
 import 'package:equatable/equatable.dart';
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 
 abstract class CartEvent extends Equatable {
   @override
@@ -23,4 +24,12 @@ class RemoveCartItem extends CartEvent {
 
   @override
   List<Object?> get props => [productId];
+}
+
+class CreateCart extends CartEvent {
+  final CartEntity cart;
+  CreateCart(this.cart);
+
+  @override
+  List<Object?> get props => [cart];
 }

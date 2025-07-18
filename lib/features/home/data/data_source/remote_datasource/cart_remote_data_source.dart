@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:sparexpress/app/constant/api_endpoints.dart';
+import 'package:sparexpress/app/shared_pref/token_shared_prefs.dart';
 import 'package:sparexpress/core/network/api_service.dart';
 import 'package:sparexpress/features/home/data/model/cart/cart_api_model.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 
 abstract interface class ICartRemoteDataSource {
-  Future<List<CartEntity>> getCartByUserId(String userId);
+  Future<List<CartEntity>> getCartByUserId();
   Future<void> createCart(CartEntity cart);
   Future<void> deleteCart(String cartId);
   Future<void> clearCartByUserId(String userId); 
@@ -13,17 +14,32 @@ abstract interface class ICartRemoteDataSource {
 
 class CartRemoteDataSource implements ICartRemoteDataSource {
   final ApiService _apiService;
+  final TokenSharedPrefs tokenSharedPrefs;
 
-  CartRemoteDataSource({required ApiService apiService}) : _apiService = apiService;
+  CartRemoteDataSource({required ApiService apiService,required this.tokenSharedPrefs}) : _apiService = apiService;
 
   @override
-  Future<List<CartEntity>> getCartByUserId(String userId) async {
+  Future<List<CartEntity>> getCartByUserId() async {
+    final tokenResult = await tokenSharedPrefs.getToken();
+
+    String? token;
+    tokenResult.fold(
+      (failure) => print("Failed to get token: ${failure.message}"),
+      (savedToken) {
+        token = savedToken;
+        print("Saved token: $token");
+      },
+    );
+    print("Token from cart remote data source: $token");
     try {
-      final response = await _apiService.dio.get('${ApiEndpoints.getCartByUser}/$userId');
+      final response = await _apiService.dio.get('${ApiEndpoints.getCartByUser}',options: Options(
+              headers: {
+                'authorization': 'Bearer $token',
+              }));
       print("Cart GET Response: ${response.data}");
 
       if (response.statusCode == 200 && response.data != null) {
-        final List<CartApiModel> models = CartApiModel.fromJsonList(response.data['data']);
+        final List<CartApiModel> models = CartApiModel.fromJsonList(response.data);
         final cartEntities = models.map((model) => model.toEntity()).toList();
         return cartEntities;
       } else {

@@ -49,3 +49,6 @@ class CartError extends CartState {
   @override
   List<Object?> get props => [message];
 }
+
+class CartCreating extends CartState {}
+class CartCreated extends CartState {}

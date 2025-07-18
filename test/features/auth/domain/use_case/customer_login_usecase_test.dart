@@ -18,7 +18,7 @@ void main() {
   setUp(() {
     mockRepository = MockICustomerRepository();
     mockTokenSharedPrefs = MockTokenSharedPrefs();
-    when(() => mockTokenSharedPrefs.saveToken(any())).thenAnswer((_) async => const Right(null));
+    when(() => mockTokenSharedPrefs.saveToken(any())).thenAnswer((_) async => const Right(true));
     useCase = CustomerLoginUseCase(
       customerRepository: mockRepository,
       tokenSharedPrefs: mockTokenSharedPrefs,

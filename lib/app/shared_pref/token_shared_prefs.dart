@@ -3,25 +3,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sparexpress/core/error/failure.dart';
 
 class TokenSharedPrefs {
-  final SharedPreferences _sharedPreferences;
+  late SharedPreferences _sharedPreferences;
 
   TokenSharedPrefs({required SharedPreferences sharedPreferences})
   : _sharedPreferences  = sharedPreferences;
 
-  Future<Either<Failure, void >> saveToken(String token) async {
+
+  Future<void> _initSharedPreferences() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+  }
+  // 
+
+  Future<Either<Failure, bool >> saveToken(String token) async {
     try{
+        _sharedPreferences = await SharedPreferences.getInstance();
       await _sharedPreferences.setString('token', token);
-      return Right(null);
+      return right(true);
     }catch(e) {
       return Left(SharedPreferencesFailure(message: 'Failed to save token: $e'),
       );
     }
   }
 
-  Future<Either<Failure, void >> getToken() async {
+  Future<Either<Failure, String? >> getToken() async {
     try{
-      await _sharedPreferences.getString('token');
-      return Right(null);
+      _sharedPreferences = await SharedPreferences.getInstance();
+      final token = _sharedPreferences.getString('token');
+      return right(token);
     }catch(e) {
       return Left(SharedPreferencesFailure(message: 'Failed to retrieve token: $e'),
       );

@@ -56,6 +56,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/create_cart_usecase.dart';
 // import 'package:sparexpress/features/home/domin/usecase/cart_usecases/get_all_cart_usecase.dart';
 
 import 'cart_event.dart';
@@ -63,13 +64,16 @@ import 'cart_state.dart';
 
 class CartBloc extends Bloc<CartEvent, CartState> {
   final GetAllCartUsecase getAllCartUsecase;
+  final CreateCartUsecase createCartUsecase;
 
-  CartBloc({required this.getAllCartUsecase}) : super(CartInitial()) {
+  CartBloc({required this.getAllCartUsecase, required this.createCartUsecase}) : super(CartInitial()) {
     on<LoadCart>(_onLoadCart);
+    on<CreateCart>(_onCreateCart);
     // Add other event handlers here if needed
   }
 
   Future<void> _onLoadCart(LoadCart event, Emitter<CartState> emit) async {
+    print("cart bloc called");
     emit(CartLoading());
     final result = await getAllCartUsecase();
 
@@ -85,6 +89,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         );
         emit(CartLoaded(items: cartItems, total: total));
       },
+    );
+  }
+
+  Future<void> _onCreateCart(CreateCart event, Emitter<CartState> emit) async {
+    emit(CartCreating());
+    final result = await createCartUsecase(event.cart);
+    result.fold(
+      (failure) => emit(CartError(failure.message)),
+      (_) => emit(CartCreated()),
     );
   }
 }

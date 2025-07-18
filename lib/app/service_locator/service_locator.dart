@@ -30,6 +30,7 @@ import 'package:sparexpress/features/home/domin/repository/products_repository.d
 import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/get_all_product_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/create_cart_usecase.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
@@ -43,15 +44,14 @@ final serviceLocator = GetIt.instance;
 Future<void> initDependencies() async {
   await _initHiveService();
   await initApiModule();
- await  _initSharedPrefs();
-
-  // Initialize all modules
+  await  _initSharedPrefs();
   await _initAuthModule();
   await _initHomeModel();
   await _initSplashModule();
   await _initProductModule();
   await _initCategoryModule();
   await _initCartModule();
+  // Dashboard Profile Header
 }
 
 Future<void> _initHiveService() async {
@@ -82,7 +82,7 @@ Future <void> _initAuthModule() async {
   );
 
 //
-  serviceLocator.registerFactory(() => CustomerRemoteDatasource(apiservice: serviceLocator<ApiService>()));
+  serviceLocator.registerFactory(() => CustomerRemoteDatasource(apiservice: serviceLocator<ApiService>(),tokenSharedPrefs:serviceLocator<TokenSharedPrefs>() ));
 
   serviceLocator.registerLazySingleton<CustomerLocalRepository>(
     () => CustomerLocalRepository(
@@ -173,23 +173,29 @@ serviceLocator.registerFactory<OfferBloc>(
 // Cart
 Future<void> _initCartModule() async {
   // Remote Data Source
-  serviceLocator.registerFactory<ICartRemoteDataSource>(
-    () => CartRemoteDataSource(apiService: serviceLocator<ApiService>()),
+  serviceLocator.registerFactory<CartRemoteDataSource>(
+    () => CartRemoteDataSource(apiService: serviceLocator<ApiService>(),tokenSharedPrefs: serviceLocator<TokenSharedPrefs>()),
   );
 
   // Repository
-  serviceLocator.registerFactory<ICartRepository>(
-    () => CartRemoteRepository(cartRemoteDataSource: serviceLocator<ICartRemoteDataSource>()),
+  serviceLocator.registerFactory<CartRemoteRepository>(
+    () => CartRemoteRepository(cartRemoteDataSource: serviceLocator<CartRemoteDataSource>()),
   );
 
   // UseCase
   serviceLocator.registerFactory<GetAllCartUsecase>(
-    () => GetAllCartUsecase(cartRepository: serviceLocator<ICartRepository>()),
+    () => GetAllCartUsecase(cartRepository: serviceLocator<CartRemoteRepository>()),
+  );
+  serviceLocator.registerFactory<CreateCartUsecase>(
+    () => CreateCartUsecase(cartRepository: serviceLocator<CartRemoteRepository>()),
   );
 
   // Bloc
   serviceLocator.registerFactory<CartBloc>(
-    () => CartBloc(getAllCartUsecase: serviceLocator<GetAllCartUsecase>()),
+    () => CartBloc(
+      getAllCartUsecase: serviceLocator<GetAllCartUsecase>(),
+      createCartUsecase: serviceLocator<CreateCartUsecase>(),
+    ),
   );
 }
 
@@ -227,5 +233,5 @@ Future<void> _initCategoryModule() async {
 
 // Splash
 Future<void> _initSplashModule() async {
-  serviceLocator.registerFactory(() => SplashViewModel());
+  serviceLocator.registerFactory(() => SplashViewModel(tokenSharedPrefs: serviceLocator<TokenSharedPrefs>()));
 }
