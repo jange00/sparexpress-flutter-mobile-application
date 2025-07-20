@@ -35,4 +35,14 @@ class TokenSharedPrefs {
       );
     }
   }
+
+  Future<Either<Failure, bool>> clearToken() async {
+    try {
+      _sharedPreferences = await SharedPreferences.getInstance();
+      await _sharedPreferences.remove('token');
+      return right(true);
+    } catch (e) {
+      return Left(SharedPreferencesFailure(message: 'Failed to clear token: $e'));
+    }
+  }
 }

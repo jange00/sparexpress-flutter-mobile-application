@@ -8,6 +8,7 @@ import 'package:sparexpress/features/home/presentation/view_model/home_state.dar
 // import 'package:sparexpress/features/home/presentation/widgets/dashboard/dashboard_header/custom_dashboard_appbar.dart';
 import 'package:sparexpress/features/home/presentation/widgets/dashboard_header/custom_dashboard_appbar.dart';
 import 'package:sparexpress/features/home/presentation/widgets/searchBar/search_bar.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/account_view_model/account_bloc.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -51,7 +52,10 @@ class _HomeViewState extends State<HomeView> {
             bodyWidget = const CartView();
             break;
           case 3:
-            bodyWidget = const AccountView();
+            bodyWidget = BlocProvider(
+              create: (context) => AccountBloc(context: context),
+              child: AccountView(),
+            );
             break;
           default:
             bodyWidget = const DashboardView();

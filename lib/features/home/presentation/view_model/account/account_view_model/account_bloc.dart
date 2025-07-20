@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'account_event.dart';
 import 'account_state.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
+import 'package:sparexpress/app/shared_pref/token_shared_prefs.dart';
 
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final BuildContext context;
@@ -34,36 +36,11 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
  Future<void> _onLogoutRequested(
     LogoutRequested event, Emitter<AccountState> emit) async {
-  final confirmed = await showDialog<bool>(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => AlertDialog(
-      title: const Text("Confirm Logout"),
-      content: const Text("Are you sure you want to logout?"),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text("Cancel"),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFFC107),
-            foregroundColor: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text("Logout"),
-        ),
-      ],
-    ),
-  );
-
-  if (confirmed == true) {
+    // Directly clear token and emit logout, UI handles confirmation
+    final tokenPrefs = serviceLocator<TokenSharedPrefs>();
+    await tokenPrefs.clearToken();
     emit(LogoutConfirmed());
-    // DO NOT navigate here
-  } else {
-    emit(AccountInitial());
   }
-}
 
   void _onShakeDetected(ShakeDetected event, Emitter<AccountState> emit) {
     add(LogoutRequested());

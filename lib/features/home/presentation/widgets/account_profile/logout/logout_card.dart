@@ -5,7 +5,8 @@ import 'package:sparexpress/features/home/presentation/view_model/account/accoun
 import 'package:sparexpress/features/home/presentation/view_model/account/account_view_model/account_event.dart';
 
 class LogoutCard extends StatelessWidget {
-  const LogoutCard({super.key});
+  final BuildContext blocContext;
+  const LogoutCard({super.key, required this.blocContext});
 
   void _showLogoutDialog(BuildContext context) {
     showGeneralDialog(
@@ -75,7 +76,7 @@ class LogoutCard extends StatelessWidget {
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                context.read<AccountBloc>().add(LogoutRequested());
+                                blocContext.read<AccountBloc>().add(LogoutRequested());
                               },
                               child: const Text("Logout"),
                             ),
