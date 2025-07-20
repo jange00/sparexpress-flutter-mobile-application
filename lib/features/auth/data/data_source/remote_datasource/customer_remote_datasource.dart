@@ -86,24 +86,37 @@ tokenResult.fold(
   }
   @override
   Future<CustomerEntity> getCurrentUser() async {
-    final token=await tokenSharedPrefs.getToken();
-    print(token);
+    final tokenResult = await tokenSharedPrefs.getToken();
+    String? token;
+    tokenResult.fold(
+      (failure) => token = null,
+      (savedToken) => token = savedToken,
+    );
+    print('Token used for getCurrentUser: $token');
     try {
-      final response = await _apiService.dio.get(ApiEndpoints.getMe,options: Options(
-        headers: {
-           'authorization': 'Bearer $token',
-        }
-      ));
-      print(response.data);
+      final response = await _apiService.dio.get(
+        ApiEndpoints.getMe,
+        options: Options(
+          headers: {
+            'authorization': token != null ? 'Bearer $token' : '',
+          },
+        ),
+      );
+      print('getCurrentUser response status: ${response.statusCode}');
+      print('getCurrentUser response data: ${response.data}');
 
       if (response.statusCode == 200) {
-        return AuthApiModel.fromJson(response.data).toEntity();
+        final user = AuthApiModel.fromJson(response.data).toEntity();
+        print('Parsed user entity: ' + user.toString());
+        return user;
       } else {
-        throw Exception("Failed to fetch current user: ${response.statusCode} ${response.statusMessage}");
+        throw Exception("Failed to fetch current user: ${response.statusCode} ${response.statusMessage} ${response.data}");
       }
     } on DioException catch (e) {
+      print('DioException in getCurrentUser: ${e.response?.data ?? e.message}');
       throw Exception('Failed to fetch current user: ${e.response?.data ?? e.message}');
     } catch (e) {
+      print('Unexpected error in getCurrentUser: $e');
       throw Exception('An unexpected error occurred: $e');
     }
   }
