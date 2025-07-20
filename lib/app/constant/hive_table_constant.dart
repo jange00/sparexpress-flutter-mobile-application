@@ -12,4 +12,13 @@ class HiveTableConstant {
 
   static const int cartId = 3;
   static const String cartBox = 'cartBox';
+
+  static const int shippingId = 4;
+  static const String shippingBox = 'shippingBox';
+
+  static const int orderId = 5;
+  static const String orderBox = 'orderBox';
+
+  static const int paymentId = 6;
+  static const String paymentBox = 'paymentBox';
 }

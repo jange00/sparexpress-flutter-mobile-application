@@ -5,6 +5,9 @@ import 'package:sparexpress/features/auth/data/model/customer_hive_model.dart';
 import 'package:sparexpress/features/home/data/model/all_product/product_hive_model.dart';
 import 'package:sparexpress/features/home/data/model/cart/cart_hive_model.dart';
 import 'package:sparexpress/features/home/data/model/category/category_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/order/order_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/payment/payment_hive_model.dart';
+import 'package:sparexpress/features/home/data/model/shipping/shipping_address_hive_model.dart';
 
 class HiveService {
   Future<void> init() async {
@@ -17,6 +20,11 @@ class HiveService {
     Hive.registerAdapter(CustomerHiveModelAdapter());
     Hive.registerAdapter(ProductHiveModelAdapter());
     Hive.registerAdapter(CategoryHiveModelAdapter());
+    Hive.registerAdapter(CartHiveModelAdapter());
+    Hive.registerAdapter(ShippingAddressHiveModelAdapter());
+    Hive.registerAdapter(OrderHiveModelAdapter());
+    Hive.registerAdapter(PaymentHiveModelAdapter());
+
   }
 
   Future<void> close() async {
@@ -203,6 +211,78 @@ Future<CartHiveModel?> getCartById(String id) async {
   );
   return box.get(id);
 }
+
+  // ======================
+  // Shipping Address Queries
+  // ======================
+
+  Future<void> addShippingAddress(ShippingAddressHiveModel address) async {
+    final box = await Hive.openBox<ShippingAddressHiveModel>(HiveTableConstant.shippingBox);
+    await box.put(address.id, address);
+  }
+
+  Future<void> deleteShippingAddress(String id) async {
+    final box = await Hive.openBox<ShippingAddressHiveModel>(HiveTableConstant.shippingBox);
+    await box.delete(id);
+  }
+
+  Future<List<ShippingAddressHiveModel>> getAllShippingAddresses() async {
+    final box = await Hive.openBox<ShippingAddressHiveModel>(HiveTableConstant.shippingBox);
+    return box.values.toList();
+  }
+
+  Future<ShippingAddressHiveModel?> getShippingAddressById(String id) async {
+    final box = await Hive.openBox<ShippingAddressHiveModel>(HiveTableConstant.shippingBox);
+    return box.get(id);
+  }
+
+    // ======================
+  // Order Queries
+  // ======================
+
+  Future<void> addOrder(OrderHiveModel order) async {
+    final box = await Hive.openBox<OrderHiveModel>(HiveTableConstant.orderBox);
+    await box.put(order.orderId, order);
+  }
+
+  Future<void> deleteOrder(String id) async {
+    final box = await Hive.openBox<OrderHiveModel>(HiveTableConstant.orderBox);
+    await box.delete(id);
+  }
+
+  Future<List<OrderHiveModel>> getAllOrders() async {
+    final box = await Hive.openBox<OrderHiveModel>(HiveTableConstant.orderBox);
+    return box.values.toList();
+  }
+
+  Future<OrderHiveModel?> getOrderById(String id) async {
+    final box = await Hive.openBox<OrderHiveModel>(HiveTableConstant.orderBox);
+    return box.get(id);
+  }
+
+    // ======================
+  // Payment Queries
+  // ======================
+
+  Future<void> addPayment(PaymentHiveModel payment) async {
+    final box = await Hive.openBox<PaymentHiveModel>(HiveTableConstant.paymentBox);
+    await box.put(payment.paymentId, payment);
+  }
+
+  Future<void> deletePayment(String id) async {
+    final box = await Hive.openBox<PaymentHiveModel>(HiveTableConstant.paymentBox);
+    await box.delete(id);
+  }
+
+  Future<List<PaymentHiveModel>> getAllPayments() async {
+    final box = await Hive.openBox<PaymentHiveModel>(HiveTableConstant.paymentBox);
+    return box.values.toList();
+  }
+
+  Future<PaymentHiveModel?> getPaymentById(String id) async {
+    final box = await Hive.openBox<PaymentHiveModel>(HiveTableConstant.paymentBox);
+    return box.get(id);
+  }
 
 
 }
