@@ -18,7 +18,7 @@ class ShippingAddressHiveModelAdapter
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ShippingAddressHiveModel(
-      id: fields[0] as String?,
+      id: fields[0] as String,
       userId: fields[1] as String,
       streetAddress: fields[2] as String,
       postalCode: fields[3] as String,

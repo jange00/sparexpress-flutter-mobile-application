@@ -42,6 +42,8 @@ import 'package:sparexpress/features/home/presentation/view_model/dashboard/prod
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/order/order_view_model/order_bloc.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
+import 'package:sparexpress/features/home/domin/use_case/product/get_product_by_id_usecase.dart';
+
 
 final serviceLocator = GetIt.instance;
 
@@ -173,6 +175,11 @@ serviceLocator.registerFactory<ProductBloc>(
 serviceLocator.registerFactory<OfferBloc>(
   () => OfferBloc(getAllProductUsecase: serviceLocator<GetAllProductUsecase>()),
 );
+
+// Additional Product Use Cases
+serviceLocator.registerLazySingleton(
+  () => GetProductByIdUsecase(repository: serviceLocator<IProductRepository>()),
+);
 }
 
 // Cart
@@ -264,7 +271,6 @@ Future<void> _initOrderModule() async {
     ),
   );
 }
-
 
 
 

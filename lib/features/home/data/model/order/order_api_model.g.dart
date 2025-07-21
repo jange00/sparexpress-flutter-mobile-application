@@ -9,6 +9,9 @@ part of 'order_api_model.dart';
 OrderItemApiModel _$OrderItemApiModelFromJson(Map<String, dynamic> json) =>
     OrderItemApiModel(
       productId: json['productId'] as String,
+      productName: json['productName'] as String?,
+      productImage: json['productImage'] as String?,
+      productPrice: (json['productPrice'] as num?)?.toDouble(),
       quantity: (json['quantity'] as num).toInt(),
       total: (json['total'] as num).toDouble(),
     );
@@ -16,6 +19,9 @@ OrderItemApiModel _$OrderItemApiModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$OrderItemApiModelToJson(OrderItemApiModel instance) =>
     <String, dynamic>{
       'productId': instance.productId,
+      'productName': instance.productName,
+      'productImage': instance.productImage,
+      'productPrice': instance.productPrice,
       'quantity': instance.quantity,
       'total': instance.total,
     };
@@ -23,12 +29,12 @@ Map<String, dynamic> _$OrderItemApiModelToJson(OrderItemApiModel instance) =>
 OrderApiModel _$OrderApiModelFromJson(Map<String, dynamic> json) =>
     OrderApiModel(
       orderId: json['_id'] as String?,
-      userId: json['userId'] as String,
-      amount: (json['amount'] as num).toDouble(),
-      shippingAddressId: json['shippingAddressId'] as String,
-      orderStatus: json['orderStatus'] as String,
-      items: (json['items'] as List<dynamic>)
-          .map((e) => OrderItemApiModel.fromJson(e as Map<String, dynamic>))
+      userId: json['userId'] as String?,
+      amount: (json['amount'] as num?)?.toDouble(),
+      shippingAddressId: json['shippingAddressId'] as String?,
+      orderStatus: json['orderStatus'] as String?,
+      items: (json['items'] as List<dynamic>?)
+          ?.map((e) => OrderItemApiModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

@@ -4,15 +4,14 @@ import 'package:sparexpress/core/error/failure.dart';
 import 'package:sparexpress/features/home/domin/entity/order_entity.dart';
 import 'package:sparexpress/features/home/domin/repository/order_repository.dart';
 
-class GetAllOrderUsecase implements UseCaseWithoutParams<List<OrderEntity>> {
+class GetAllOrderUsecase {
   final IOrderRepository _repository;
 
   GetAllOrderUsecase({required IOrderRepository repository}) : _repository = repository;
 
-  @override
-  Future<Either<Failure, List<OrderEntity>>> call() async {
+  Future<Either<Failure, List<OrderEntity>>> call(String userId) async {
     try {
-      final result = await _repository.getOrdersByUserId();
+      final result = await _repository.getOrdersByUserId(userId);
       return result.fold(
         (failure) => Left(failure),
         (orders) => Right(orders),

@@ -32,12 +32,12 @@ class ShippingRemoteRepository implements IShippingAddressRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteShippingAddress(String id) async {
+  Future<Either<Failure, void>> deleteShippingAddress(String addressId) async {
     try {
-      await _shippingRemoteDataSource.deleteShippingAddress(id);
+      await _shippingRemoteDataSource.deleteShippingAddress(addressId);
       return const Right(null);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }
   }
-}
+} 

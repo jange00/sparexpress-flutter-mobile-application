@@ -31,7 +31,7 @@ class OrderLocalRepository implements IOrderRepository {
   }
 
   @override
-  Future<Either<Failure, List<OrderEntity>>> getOrdersByUserId() async {
+  Future<Either<Failure, List<OrderEntity>>> getOrdersByUserId(String userId) async {
     try {
       final result = await _localDataSource.getOrders();
       return Right(result);

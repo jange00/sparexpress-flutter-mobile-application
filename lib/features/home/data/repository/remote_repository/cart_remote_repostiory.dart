@@ -13,7 +13,7 @@ class CartRemoteRepository implements ICartRepository {
   }) : _cartRemoteDataSource = cartRemoteDataSource;
 
   @override
-  Future<Either<Failure, List<CartEntity>>> getCartByUserId(String userId) async {
+  Future<Either<Failure, List<CartEntity>>> getCarts() async {
     try {
       final cartItems = await _cartRemoteDataSource.getCartByUserId();
       return Right(cartItems);
@@ -37,16 +37,6 @@ class CartRemoteRepository implements ICartRepository {
     try {
       await _cartRemoteDataSource.deleteCart(cartId);
       return const Right(null);
-    } catch (e) {
-      return Left(RemoteDatabaseFailure(message: e.toString()));
-    }
-  }
-  
-  @override
-  Future<Either<Failure, List<CartEntity>>> getCarts() async {
-    try {
-      final cartItems = await _cartRemoteDataSource.getCartByUserId();
-      return Right(cartItems);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }

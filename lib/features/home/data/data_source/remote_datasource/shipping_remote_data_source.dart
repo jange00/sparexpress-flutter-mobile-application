@@ -38,8 +38,8 @@ class ShippingAddressRemoteDataSource implements IShippingAddressRemoteDataSourc
   }
 
   @override
-  Future<void> createShippingAddress(ShippingAddressEntity address) async {
-    final body = ShippingAddressApiModel.fromEntity(address).toJson();
+  Future<void> createShippingAddress(ShippingAddressEntity shipping) async {
+    final body = ShippingAddressApiModel.fromEntity(shipping).toJson();
     await _apiService.dio.post(ApiEndpoints.createShippingAddress, data: body);
   }
 
@@ -48,4 +48,4 @@ class ShippingAddressRemoteDataSource implements IShippingAddressRemoteDataSourc
     final endpoint = ApiEndpoints.deleteShippingAddress.replaceFirst(':id', addressId);
     await _apiService.dio.delete(endpoint);
   }
-}
+} 

@@ -1,16 +1,12 @@
-
-
-import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 
-part 'shipping_address_api_model.g.dart';
+part 'shipping_api_model.g.dart';
 
 @JsonSerializable()
-class ShippingAddressApiModel extends Equatable {
+class ShippingApiModel {
   @JsonKey(name: '_id')
   final String? id;
-
   final String userId;
   final String streetAddress;
   final String postalCode;
@@ -19,7 +15,7 @@ class ShippingAddressApiModel extends Equatable {
   final String province;
   final String country;
 
-  const ShippingAddressApiModel({
+  ShippingApiModel({
     this.id,
     required this.userId,
     required this.streetAddress,
@@ -30,16 +26,13 @@ class ShippingAddressApiModel extends Equatable {
     required this.country,
   });
 
-  /// From JSON (API -> Model)
-  factory ShippingAddressApiModel.fromJson(Map<String, dynamic> json) =>
-      _$ShippingAddressApiModelFromJson(json);
+  factory ShippingApiModel.fromJson(Map<String, dynamic> json) =>
+      _$ShippingApiModelFromJson(json);
 
-  /// To JSON (Model -> API)
-  Map<String, dynamic> toJson() => _$ShippingAddressApiModelToJson(this);
+  Map<String, dynamic> toJson() => _$ShippingApiModelToJson(this);
 
-  /// From Entity (Domain -> Model)
-  factory ShippingAddressApiModel.fromEntity(ShippingAddressEntity entity) {
-    return ShippingAddressApiModel(
+  factory ShippingApiModel.fromEntity(ShippingAddressEntity entity) {
+    return ShippingApiModel(
       id: entity.id,
       userId: entity.userId,
       streetAddress: entity.streetAddress,
@@ -51,7 +44,6 @@ class ShippingAddressApiModel extends Equatable {
     );
   }
 
-  /// To Entity (Model -> Domain)
   ShippingAddressEntity toEntity() {
     return ShippingAddressEntity(
       id: id,
@@ -64,15 +56,4 @@ class ShippingAddressApiModel extends Equatable {
       country: country,
     );
   }
-
-  /// From JSON list
-  static List<ShippingAddressApiModel> fromJsonList(List<dynamic> jsonList) {
-    return jsonList
-        .map((json) => ShippingAddressApiModel.fromJson(json as Map<String, dynamic>))
-        .toList();
-  }
-
-  @override
-  List<Object?> get props =>
-      [id, userId, streetAddress, postalCode, city, district, province, country];
-}
+} 

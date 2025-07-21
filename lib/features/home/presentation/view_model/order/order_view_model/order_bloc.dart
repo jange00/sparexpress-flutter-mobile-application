@@ -9,7 +9,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   OrderBloc({required this.getAllOrderUsecase}) : super(OrderInitial()) {
     on<GetOrdersByUserIdEvent>((event, emit) async {
       emit(OrderLoading());
-      final result = await getAllOrderUsecase();
+      final result = await getAllOrderUsecase(event.userId);
       result.fold(
         (failure) => emit(OrderError(failure.message)),
         (orders) => emit(OrderLoaded(orders)),

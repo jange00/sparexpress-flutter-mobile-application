@@ -12,9 +12,9 @@ class OrderRemoteRepository implements IOrderRepository {
   }) : _orderRemoteDataSource = orderRemoteDataSource;
 
   @override
-  Future<Either<Failure, List<OrderEntity>>> getOrdersByUserId() async {
+  Future<Either<Failure, List<OrderEntity>>> getOrdersByUserId(String userId) async {
     try {
-      final orders = await _orderRemoteDataSource.getOrdersByUserId();
+      final orders = await _orderRemoteDataSource.getOrdersByUserId(userId);
       return Right(orders);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));

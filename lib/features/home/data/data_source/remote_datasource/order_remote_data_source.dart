@@ -6,7 +6,7 @@ import 'package:sparexpress/features/home/data/model/order/order_api_model.dart'
 import 'package:sparexpress/features/home/domin/entity/order_entity.dart';
 
 abstract interface class IOrderRemoteDataSource {
-  Future<List<OrderEntity>> getOrdersByUserId();
+  Future<List<OrderEntity>> getOrdersByUserId(String userId);
   Future<void> createOrder(OrderEntity order);
   Future<void> deleteOrder(String orderId);
 }
@@ -19,35 +19,19 @@ class OrderRemoteDataSource implements IOrderRemoteDataSource {
       : _apiService = apiService;
 
   @override
-  Future<List<OrderEntity>> getOrdersByUserId() async {
+  Future<List<OrderEntity>> getOrdersByUserId(String userId) async {
     final tokenResult = await tokenSharedPrefs.getToken();
     String? token;
-    String? userId;
-
     tokenResult.fold(
       (failure) => print("Failed to get token: ${failure.message}"),
       (savedToken) => token = savedToken,
     );
-
-    // Extract userId from token if possible, or get from ProfileBloc if you have access
-    // For now, try to get userId from tokenSharedPrefs (if you store it), else fallback to empty string
-    // TODO: Replace this with actual userId extraction logic if needed
-    // userId = ...
-
-    // For demonstration, let's assume you have a method to get userId from tokenSharedPrefs
-    // If not, you need to pass userId as a parameter to this method
-    // Example: final userId = await tokenSharedPrefs.getUserId();
-    // For now, fallback to empty string
-    userId = '';
-
-    final endpoint = ApiEndpoints.getOrderByUserId.replaceFirst(':userId', userId ?? '');
-
+    final endpoint = ApiEndpoints.getOrderByUserId.replaceFirst(':userId', userId);
     final response = await _apiService.dio.get(
       endpoint,
       options: Options(headers: {'authorization': 'Bearer $token'}),
     );
-
-    final List<OrderApiModel> models = OrderApiModel.fromJsonList(response.data);
+    final List<OrderApiModel> models = OrderApiModel.fromJsonList(response.data['data']);
     return models.map((e) => e.toEntity()).toList();
   }
 

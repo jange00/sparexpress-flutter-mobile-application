@@ -17,9 +17,9 @@ class OrderItemHiveModelAdapter extends TypeAdapter<OrderItemHiveModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return OrderItemHiveModel(
-      productId: fields[0] as String,
-      quantity: fields[1] as int,
-      total: fields[2] as double,
+      productId: fields[0] as String?,
+      quantity: fields[1] as int?,
+      total: fields[2] as double?,
     );
   }
 
@@ -58,11 +58,11 @@ class OrderHiveModelAdapter extends TypeAdapter<OrderHiveModel> {
     };
     return OrderHiveModel(
       orderId: fields[0] as String?,
-      userId: fields[1] as String,
-      amount: fields[2] as double,
-      shippingAddressId: fields[3] as String,
-      orderStatus: fields[4] as String,
-      items: (fields[5] as List).cast<OrderItemHiveModel>(),
+      userId: fields[1] as String?,
+      amount: fields[2] as double?,
+      shippingAddressId: fields[3] as String?,
+      orderStatus: fields[4] as String?,
+      items: (fields[5] as List?)?.cast<OrderItemHiveModel>(),
     );
   }
 
