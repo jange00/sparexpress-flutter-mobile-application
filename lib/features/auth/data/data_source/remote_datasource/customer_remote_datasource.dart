@@ -106,7 +106,7 @@ tokenResult.fold(
       print('getCurrentUser response data: ${response.data}');
 
       if (response.statusCode == 200) {
-        final user = AuthApiModel.fromJson(response.data).toEntity();
+        final user = AuthApiModel.fromJson(response.data['data']).toEntity();
         print('Parsed user entity: ' + user.toString());
         return user;
       } else {

@@ -45,4 +45,6 @@ class OrderEntity extends Equatable {
         orderStatus,
         items,
       ];
+
+  get totalAmount => null;
 }

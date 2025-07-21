@@ -17,12 +17,14 @@ import 'package:sparexpress/features/auth/presentation/view_model/register_view_
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/cart_remote_data_source.dart';
 // import 'package:sparexpress/features/home/data/data_source/local_datasource/category_local_data_source.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/category_remote_data_source.dart';
+import 'package:sparexpress/features/home/data/data_source/remote_datasource/order_remote_data_source.dart';
 // import 'package:sparexpress/features/home/data/data_source/local_datasource/product_local_data_source.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/product_remote_data_source.dart';
 // import 'package:sparexpress/features/home/data/repository/local_repository/cart_local_repository.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/cart_remote_repostiory.dart';
 // import 'package:sparexpress/features/home/data/repository/local_repository/category_local_repository.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/category_remote_repository.dart';
+import 'package:sparexpress/features/home/data/repository/remote_repository/order_remote_repository.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/product_remote_repository.dart';
 import 'package:sparexpress/features/home/domin/repository/cart_repository.dart';
 import 'package:sparexpress/features/home/domin/repository/category_repository.dart';
@@ -31,12 +33,14 @@ import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_useca
 import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/get_all_product_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/create_cart_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/order/get_all_order_usecase.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/dicounted_products_view_model/offer_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/order/order_view_model/order_bloc.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 
 final serviceLocator = GetIt.instance;
@@ -51,6 +55,7 @@ Future<void> initDependencies() async {
   await _initProductModule();
   await _initCategoryModule();
   await _initCartModule();
+  await _initOrderModule();
   // Dashboard Profile Header
 }
 
@@ -227,6 +232,39 @@ Future<void> _initCategoryModule() async {
     ),
   );
 }
+
+// Order
+Future<void> _initOrderModule() async {
+  // Remote Data Source
+  serviceLocator.registerFactory<OrderRemoteDataSource>(
+    () => OrderRemoteDataSource(
+      apiService: serviceLocator<ApiService>(),
+      tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
+    ),
+  );
+
+  // Repository
+  serviceLocator.registerFactory<OrderRemoteRepository>(
+    () => OrderRemoteRepository(
+      orderRemoteDataSource: serviceLocator<OrderRemoteDataSource>(),
+    ),
+  );
+
+  // UseCases
+  serviceLocator.registerFactory<GetAllOrderUsecase>(
+    () => GetAllOrderUsecase(
+      repository: serviceLocator<OrderRemoteRepository>(),
+    ),
+  );
+
+  // Bloc
+  serviceLocator.registerFactory<OrderBloc>(
+    () => OrderBloc(
+      getAllOrderUsecase: serviceLocator<GetAllOrderUsecase>(),
+    ),
+  );
+}
+
 
 
 

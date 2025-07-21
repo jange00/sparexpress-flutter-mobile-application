@@ -45,6 +45,22 @@ class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidg
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is ProfileLoaded) {
                     final user = state.customer;
+                    String getProfileImageUrl(String? profileImage) {
+                      if (profileImage == null || profileImage.isEmpty) {
+                        return '';
+                      }
+                      if (profileImage.startsWith('http')) {
+                        return profileImage;
+                      }
+                      return 'http://localhost:3000/$profileImage';
+                    }
+                    final imageUrl = getProfileImageUrl(user.profileImage);
+                    ImageProvider avatarProvider;
+                    if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasAbsolutePath == true) {
+                      avatarProvider = NetworkImage(imageUrl);
+                    } else {
+                      avatarProvider = const AssetImage('assets/images/mouse.jpg');
+                    }
                     return Row(
                       children: [
                         Expanded(
@@ -75,9 +91,7 @@ class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidg
                         ),
                         CircleAvatar(
                           radius: 28,
-                          backgroundImage: user.profileImage != null && user.profileImage!.isNotEmpty
-                              ? NetworkImage(user.profileImage!)
-                              : const AssetImage('assets/images/mouse.jpg') as ImageProvider,
+                          backgroundImage: avatarProvider,
                           backgroundColor: Colors.white24,
                         ),
                       ],
