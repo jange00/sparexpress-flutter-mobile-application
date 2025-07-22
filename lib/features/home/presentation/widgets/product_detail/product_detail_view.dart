@@ -18,6 +18,7 @@ import 'package:sparexpress/features/home/presentation/widgets/checkout/checkout
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/checkout/checkout_bloc.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+import 'package:flutter/services.dart';
 
 
 class ProductDetailView extends StatelessWidget {
@@ -686,8 +687,8 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                         backgroundColor: Colors.transparent,
                                         builder: (sheetContext) {
                                           return DraggableScrollableSheet(
-                                            initialChildSize: 0.7,
-                                            minChildSize: 0.4,
+                                            initialChildSize: 0.8,
+                                            minChildSize: 0.5,
                                             maxChildSize: 0.95,
                                             expand: false,
                                             builder: (context, scrollController) {
@@ -706,14 +707,33 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                 child: Column(
                                                   mainAxisSize: MainAxisSize.min,
                                                   children: [
+                                                    // Drag handle
                                                     Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                                      padding: const EdgeInsets.only(top: 12, bottom: 4),
+                                                      child: Container(
+                                                        width: 40,
+                                                        height: 5,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.grey[300],
+                                                          borderRadius: BorderRadius.circular(4),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                       child: Row(
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
-                                                          const Text('Select Shipping Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: const [
+                                                              Text('Select Shipping Address', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                                              SizedBox(height: 2),
+                                                              Text('Choose where to deliver your order', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                                            ],
+                                                          ),
                                                           IconButton(
-                                                            icon: const Icon(Icons.close),
+                                                            icon: const Icon(Icons.close, color: Colors.grey, size: 26),
                                                             onPressed: () => Navigator.of(sheetContext).pop(),
                                                           ),
                                                         ],
@@ -726,10 +746,109 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                           BlocProvider.value(value: profileBloc),
                                                           BlocProvider.value(value: shippingAddressBloc),
                                                         ],
-                                                        child: ShippingAddressListPage(
-                                                          userId: userId,
-                                                          onAddressSelected: (address) {
-                                                            Navigator.of(sheetContext).pop(address);
+                                                        child: BlocBuilder<ShippingAddressBloc, ShippingAddressState>(
+                                                          builder: (context, state) {
+                                                            if (state is ShippingAddressLoading) {
+                                                              return const Center(child: CircularProgressIndicator());
+                                                            } else if (state is ShippingAddressLoaded) {
+                                                              if (state.addresses.isEmpty) {
+                                                                return Center(
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                                                                    child: Column(
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                      children: [
+                                                                        const Text('No addresses found.', style: TextStyle(fontSize: 16)),
+                                                                        const SizedBox(height: 16),
+                                                                        ElevatedButton.icon(
+                                                                          icon: const Icon(Icons.add_location_alt),
+                                                                          style: ElevatedButton.styleFrom(
+                                                                            backgroundColor: Colors.deepOrange,
+                                                                            foregroundColor: Colors.white,
+                                                                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                                          ),
+                                                                          onPressed: () {
+                                                                            Navigator.pushNamed(sheetContext, '/add-shipping-address');
+                                                                          },
+                                                                          label: const Text('Add New Address', style: TextStyle(fontSize: 16)),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                              return ListView.separated(
+                                                                controller: scrollController,
+                                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                                                itemCount: state.addresses.length + 1,
+                                                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                                                itemBuilder: (context, index) {
+                                                                  if (index == state.addresses.length) {
+                                                                    // Add New Address button at the end
+                                                                    return Padding(
+                                                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                                      child: ElevatedButton.icon(
+                                                                        icon: const Icon(Icons.add_location_alt),
+                                                                        style: ElevatedButton.styleFrom(
+                                                                          backgroundColor: Colors.deepOrange,
+                                                                          foregroundColor: Colors.white,
+                                                                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                                        ),
+                                                                        onPressed: () {
+                                                                          Navigator.pushNamed(sheetContext, '/add-shipping-address');
+                                                                        },
+                                                                        label: const Text('Add New Address', style: TextStyle(fontSize: 16)),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                  final address = state.addresses[index];
+                                                                  return Card(
+                                                                    elevation: 2,
+                                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                                                    child: Padding(
+                                                                      padding: const EdgeInsets.all(16.0),
+                                                                      child: Column(
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          Row(
+                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                            children: [
+                                                                              Expanded(
+                                                                                child: Text(
+                                                                                  '${address.streetAddress}, ${address.city}',
+                                                                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                                                ),
+                                                                              ),
+                                                                              ElevatedButton(
+                                                                                onPressed: () {
+                                                                                  Navigator.of(sheetContext).pop(address);
+                                                                                },
+                                                                                style: ElevatedButton.styleFrom(
+                                                                                  backgroundColor: Colors.deepOrange,
+                                                                                  foregroundColor: Colors.white,
+                                                                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                                                ),
+                                                                                child: const Text('Select'),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          const SizedBox(height: 6),
+                                                                          Text('${address.district}, ${address.province}, ${address.country}', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                                                                          const SizedBox(height: 2),
+                                                                          Text('Postal Code: ${address.postalCode}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              );
+                                                            } else if (state is ShippingAddressError) {
+                                                              return Center(child: Text(state.message));
+                                                            }
+                                                            return const SizedBox.shrink();
                                                           },
                                                         ),
                                                       ),
