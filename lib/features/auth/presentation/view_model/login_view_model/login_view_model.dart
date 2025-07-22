@@ -12,6 +12,8 @@ import 'package:sparexpress/features/auth/presentation/view_model/register_view_
 import 'package:sparexpress/features/home/presentation/view/home_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
 import 'package:sparexpress/app/constant/theme_constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sparexpress/features/auth/domain/use_case/customer_get_current_usecase.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState>{
   final CustomerLoginUseCase _customerLoginUseCase;
@@ -82,9 +84,40 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
           color: Colors.red,
         );
       },
-      (token) {
+      (token) async {
         // Handle success case
         emit(state.copyWith(isLoading: false, isSuccess: true));
+        // Fetch user profile and save userId
+        final getCurrentUser = serviceLocator<CustomerGetCurrentUseCase>();
+        final userResult = await getCurrentUser();
+        bool userIdSaved = false;
+        await userResult.fold(
+          (failure) async {
+            showMySnackBar(
+              context: event.context,
+              message: 'Failed to fetch user profile. Please try again.',
+              color: Colors.red,
+            );
+          },
+          (user) async {
+            final prefs = serviceLocator<SharedPreferences>();
+            if (user.customerId != null && user.customerId!.isNotEmpty) {
+              await prefs.setString('userId', user.customerId!);
+              print('Saved userId: \'${user.customerId}\' to SharedPreferences');
+              userIdSaved = true;
+            } else {
+              showMySnackBar(
+                context: event.context,
+                message: 'User ID missing in profile. Please contact support.',
+                color: Colors.red,
+              );
+            }
+          },
+        );
+        if (!userIdSaved) {
+          emit(state.copyWith(isLoading: false, isSuccess: false));
+          return;
+        }
         Navigator.pushReplacement(
           event.context,
           MaterialPageRoute(

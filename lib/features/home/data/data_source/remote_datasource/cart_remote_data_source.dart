@@ -58,12 +58,22 @@ class CartRemoteDataSource implements ICartRemoteDataSource {
   Future<void> createCart(CartEntity cart) async {
     try {
       final cartJson = CartApiModel.fromEntity(cart).toJson();
-
+      // Get token for Authorization header
+      final tokenResult = await tokenSharedPrefs.getToken();
+      String? token;
+      tokenResult.fold(
+        (failure) => print("Failed to get token: ${failure.message}"),
+        (savedToken) => token = savedToken,
+      );
       final response = await _apiService.dio.post(
         ApiEndpoints.createCart,
         data: cartJson,
+        options: Options(
+          headers: {
+            'authorization': token != null ? 'Bearer $token' : '',
+          },
+        ),
       );
-
       if (response.statusCode != 201) {
         throw Exception("Failed to create cart: ${response.statusMessage}");
       }
@@ -71,7 +81,7 @@ class CartRemoteDataSource implements ICartRemoteDataSource {
       print('Dio error: ${e.response?.data ?? e.message}');
       throw Exception(e.message ?? 'DioException occurred');
     } catch (e) {
-      print('Unhandled error: $e');
+      print('Unhandled error: ${e.toString()}');
       throw Exception("Unhandled exception: ${e.toString()}");
     }
   }

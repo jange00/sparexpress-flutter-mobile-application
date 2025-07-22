@@ -6,6 +6,7 @@ import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/create_cart_usecase.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_usecase.dart';
 
 class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
   ProductDetailBloc(ProductEntity product)
@@ -26,6 +27,19 @@ class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
       final userId = prefs.getString('userId');
       if (userId == null || userId.isEmpty) {
         emit(state.copyWith(isLoading: false, error: 'User not found. Please login again.'));
+        return;
+      }
+      final getAllCartUsecase = serviceLocator<GetAllCartUsecase>();
+      final cartResult = await getAllCartUsecase();
+      bool alreadyInCart = false;
+      cartResult.fold(
+        (failure) {},
+        (cartItems) {
+          alreadyInCart = cartItems.any((item) => item.productId == state.product.productId);
+        },
+      );
+      if (alreadyInCart) {
+        emit(state.copyWith(isLoading: false, error: 'Product is already in cart.', addToCartSuccess: false));
         return;
       }
       final cartEntity = CartEntity(

@@ -50,13 +50,22 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
     return BlocConsumer<ProductDetailBloc, ProductDetailState>(
       listener: (context, state) {
         if (state.error != null) {
+          final isAlreadyInCart = state.error == 'Product is already in cart.';
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error!)),
+            SnackBar(
+              content: Text(state.error!),
+              backgroundColor: isAlreadyInCart
+                ? Theme.of(context).colorScheme.error.withOpacity(0.9)
+                : Theme.of(context).colorScheme.error,
+            ),
           );
         }
         if (state.addToCartSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${state.product.name} added to cart!')),
+            SnackBar(
+              content: Text('${state.product.name} added to cart!'),
+              backgroundColor: const Color(0xFFFFC107),
+            ),
           );
           Navigator.push(
             context,
