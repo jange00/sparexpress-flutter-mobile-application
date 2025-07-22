@@ -12,9 +12,9 @@ class ShippingRemoteRepository implements IShippingAddressRepository {
   }) : _shippingRemoteDataSource = shippingRemoteDataSource;
 
   @override
-  Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId() async {
+  Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId(String userId) async {
     try {
-      final addresses = await _shippingRemoteDataSource.getShippingAddressesByUserId();
+      final addresses = await _shippingRemoteDataSource.getShippingAddressesByUserId(userId);
       return Right(addresses);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));

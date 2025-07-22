@@ -44,6 +44,14 @@ import 'package:sparexpress/features/home/presentation/view_model/order/order_vi
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 import 'package:sparexpress/features/home/domin/use_case/product/get_product_by_id_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/delete_cart_usecase.dart';
+import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_bloc.dart';
+import 'package:sparexpress/features/home/domin/use_case/shipping/get_all_shipping_addresses_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/shipping/create_shipping_address_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/shipping/delete_shipping_address_usecase.dart';
+import 'package:sparexpress/features/home/presentation/view_model/checkout/checkout_bloc.dart';
+import 'package:sparexpress/features/home/domin/repository/shipping_repository.dart';
+import 'package:sparexpress/features/home/data/data_source/remote_datasource/shipping_remote_data_source.dart';
+import 'package:sparexpress/features/home/data/repository/remote_repository/shipping_remote_repository.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -59,6 +67,8 @@ Future<void> initDependencies() async {
   await _initCategoryModule();
   await _initCartModule();
   await _initOrderModule();
+  await _initShippingModule();
+  await _initCheckoutModule();
   // Dashboard Profile Header
 }
 
@@ -277,7 +287,48 @@ Future<void> _initOrderModule() async {
   );
 }
 
+Future<void> _initShippingModule() async {
+  // Remote Data Source
+  serviceLocator.registerFactory<ShippingAddressRemoteDataSource>(
+    () => ShippingAddressRemoteDataSource(
+      apiService: serviceLocator<ApiService>(),
+      tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
+    ),
+  );
+  // Repository
+  serviceLocator.registerFactory<IShippingAddressRepository>(
+    () => ShippingRemoteRepository(
+      shippingRemoteDataSource: serviceLocator<ShippingAddressRemoteDataSource>(),
+    ),
+  );
+  // UseCases
+  serviceLocator.registerFactory<GetAllShippingAddressUsecase>(
+    () => GetAllShippingAddressUsecase(repository: serviceLocator<IShippingAddressRepository>()),
+  );
+  serviceLocator.registerFactory<CreateShippingAddressUsecase>(
+    () => CreateShippingAddressUsecase(repository: serviceLocator<IShippingAddressRepository>()),
+  );
+  serviceLocator.registerFactory<DeleteShippingAddressUsecase>(
+    () => DeleteShippingAddressUsecase(repository: serviceLocator<IShippingAddressRepository>()),
+  );
+  // Bloc
+  serviceLocator.registerFactory<ShippingAddressBloc>(
+    () => ShippingAddressBloc(
+      getAllShippingAddressUsecase: serviceLocator<GetAllShippingAddressUsecase>(),
+      createShippingAddressUsecase: serviceLocator<CreateShippingAddressUsecase>(),
+      deleteShippingAddressUsecase: serviceLocator<DeleteShippingAddressUsecase>(),
+    ),
+  );
+}
 
+Future<void> _initCheckoutModule() async {
+  serviceLocator.registerFactory<CheckoutBloc>(
+    () => CheckoutBloc(
+      getProductByIdUsecase: serviceLocator<GetProductByIdUsecase>(),
+      getAllShippingAddressUsecase: serviceLocator<GetAllShippingAddressUsecase>(),
+    ),
+  );
+}
 
 
 // Splash

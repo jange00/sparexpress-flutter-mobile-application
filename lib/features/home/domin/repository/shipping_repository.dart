@@ -4,7 +4,7 @@ import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 
 
 abstract interface class IShippingAddressRepository {
-  Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId();
+  Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId(String userId);
   // Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId(String userId);
   Future<Either<Failure, void>> createShippingAddress(ShippingAddressEntity address);
   Future<Either<Failure, void>> deleteShippingAddress(String id);

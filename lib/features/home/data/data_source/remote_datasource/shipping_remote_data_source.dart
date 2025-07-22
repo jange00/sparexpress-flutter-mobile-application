@@ -6,7 +6,7 @@ import 'package:sparexpress/features/home/data/model/shipping/shipping_address_a
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 
 abstract interface class IShippingAddressRemoteDataSource {
-  Future<List<ShippingAddressEntity>> getShippingAddressesByUserId();
+  Future<List<ShippingAddressEntity>> getShippingAddressesByUserId(String userId);
   Future<void> createShippingAddress(ShippingAddressEntity address);
   Future<void> deleteShippingAddress(String addressId);
 }
@@ -19,7 +19,7 @@ class ShippingAddressRemoteDataSource implements IShippingAddressRemoteDataSourc
       : _apiService = apiService;
 
   @override
-  Future<List<ShippingAddressEntity>> getShippingAddressesByUserId() async {
+  Future<List<ShippingAddressEntity>> getShippingAddressesByUserId(String userId) async {
     final tokenResult = await tokenSharedPrefs.getToken();
     String? token;
 
@@ -28,12 +28,16 @@ class ShippingAddressRemoteDataSource implements IShippingAddressRemoteDataSourc
       (savedToken) => token = savedToken,
     );
 
+    final endpoint = ApiEndpoints.getShippingAddressesByUserId.replaceFirst(':userId', userId);
     final response = await _apiService.dio.get(
-      ApiEndpoints.getShippingAddressesByUserId,
+      endpoint,
       options: Options(headers: {'authorization': 'Bearer $token'}),
     );
 
-    final List<ShippingAddressApiModel> models = ShippingAddressApiModel.fromJsonList(response.data);
+    // The API response is a Map with a 'data' field containing the list
+    final dynamic raw = response.data;
+    final List<dynamic> dataList = raw is Map<String, dynamic> && raw['data'] is List ? raw['data'] : <dynamic>[];
+    final List<ShippingAddressApiModel> models = ShippingAddressApiModel.fromJsonList(dataList);
     return models.map((e) => e.toEntity()).toList();
   }
 

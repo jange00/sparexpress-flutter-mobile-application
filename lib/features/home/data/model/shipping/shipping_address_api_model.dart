@@ -31,8 +31,27 @@ class ShippingAddressApiModel extends Equatable {
   });
 
   /// From JSON (API -> Model)
-  factory ShippingAddressApiModel.fromJson(Map<String, dynamic> json) =>
-      _$ShippingAddressApiModelFromJson(json);
+  factory ShippingAddressApiModel.fromJson(Map<String, dynamic> json) {
+    // Handle userId as String or Map
+    String userId;
+    if (json['userId'] is String) {
+      userId = json['userId'];
+    } else if (json['userId'] is Map) {
+      userId = json['userId']['_id']?.toString() ?? '';
+    } else {
+      userId = '';
+    }
+    return ShippingAddressApiModel(
+      id: json['_id'] as String?,
+      userId: userId,
+      streetAddress: json['streetAddress'] as String,
+      postalCode: json['postalCode'] as String,
+      city: json['city'] as String,
+      district: json['district'] as String,
+      province: json['province'] as String,
+      country: json['country'] as String,
+    );
+  }
 
   /// To JSON (Model -> API)
   Map<String, dynamic> toJson() => _$ShippingAddressApiModelToJson(this);

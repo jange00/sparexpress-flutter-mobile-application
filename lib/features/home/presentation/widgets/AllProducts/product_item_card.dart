@@ -2,6 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:sparexpress/features/home/presentation/widgets/product_detail/product_detail_view.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductItemCard extends StatelessWidget {
   final ProductEntity product;
@@ -159,7 +162,13 @@ class ProductItemCard extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => ProductDetailView(product: product),
+                                  builder: (_) => MultiBlocProvider(
+                                    providers: [
+                                      BlocProvider.value(value: BlocProvider.of<ProfileBloc>(context)),
+                                      BlocProvider.value(value: BlocProvider.of<CartBloc>(context)),
+                                    ],
+                                    child: ProductDetailView(product: product),
+                                  ),
                                 ),
                               );
                             },

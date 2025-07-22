@@ -4,15 +4,15 @@ import 'package:sparexpress/core/error/failure.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 import 'package:sparexpress/features/home/domin/repository/shipping_repository.dart';
 
-class GetAllShippingAddressUsecase implements UseCaseWithoutParams<List<ShippingAddressEntity>> {
+class GetAllShippingAddressUsecase implements UseCaseWithParams<List<ShippingAddressEntity>, String> {
   final IShippingAddressRepository _repository;
 
   GetAllShippingAddressUsecase({required IShippingAddressRepository repository}) : _repository = repository;
 
   @override
-  Future<Either<Failure, List<ShippingAddressEntity>>> call() async {
+  Future<Either<Failure, List<ShippingAddressEntity>>> call(String userId) async {
     try {
-      final result = await _repository.getShippingAddressesByUserId();
+      final result = await _repository.getShippingAddressesByUserId(userId);
       return result.fold(
         (failure) => Left(failure),
         (data) => Right(data),

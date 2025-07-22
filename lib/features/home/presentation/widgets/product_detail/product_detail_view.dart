@@ -8,6 +8,17 @@ import 'package:sparexpress/features/home/presentation/view_model/product_detail
 import 'package:sparexpress/features/home/presentation/view/bottom_view/cart_view.dart';
 import 'dart:math';
 import 'package:shimmer/shimmer.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/shipping_address/shipping_address_list_page.dart';
+import 'package:sparexpress/features/home/presentation/widgets/checkout/checkout_page.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
+import 'package:sparexpress/features/home/presentation/view_model/checkout/checkout_bloc.dart';
+import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+
 
 class ProductDetailView extends StatelessWidget {
   final ProductEntity product;
@@ -654,26 +665,122 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: product.stock == 0
-                              ? null
-                              : () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Proceeding to buy now (checkout not implemented).')),
-                                  );
-                                },
-                          icon: const Icon(Icons.flash_on, color: Colors.white),
-                          label: const Text("Buy Now", style: TextStyle(fontSize: 16)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepOrange,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      BlocBuilder<ProfileBloc, ProfileState>(
+                        builder: (context, profileState) {
+                          final isLoaded = profileState is ProfileLoaded;
+                          // Capture the blocs before calling the bottom sheet
+                          final profileBloc = BlocProvider.of<ProfileBloc>(context);
+                          final shippingAddressBloc = serviceLocator<ShippingAddressBloc>();
+                          return Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: product.stock == 0 || !isLoaded
+                                  ? null
+                                  : () async {
+                                      final checkoutBloc = serviceLocator<CheckoutBloc>();
+                                      final loadedState = profileState as ProfileLoaded;
+                                      final userId = loadedState.customer.customerId ?? '';
+                                      shippingAddressBloc.add(FetchAddresses(userId));
+                                      final address = await showModalBottomSheet<ShippingAddressEntity>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (sheetContext) {
+                                          return DraggableScrollableSheet(
+                                            initialChildSize: 0.7,
+                                            minChildSize: 0.4,
+                                            maxChildSize: 0.95,
+                                            expand: false,
+                                            builder: (context, scrollController) {
+                                              return Container(
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black12,
+                                                      blurRadius: 16,
+                                                      offset: Offset(0, -4),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          const Text('Select Shipping Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                                          IconButton(
+                                                            icon: const Icon(Icons.close),
+                                                            onPressed: () => Navigator.of(sheetContext).pop(),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const Divider(height: 1),
+                                                    Expanded(
+                                                      child: MultiBlocProvider(
+                                                        providers: [
+                                                          BlocProvider.value(value: profileBloc),
+                                                          BlocProvider.value(value: shippingAddressBloc),
+                                                        ],
+                                                        child: ShippingAddressListPage(
+                                                          userId: userId,
+                                                          onAddressSelected: (address) {
+                                                            Navigator.of(sheetContext).pop(address);
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                      if (address != null) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => MultiBlocProvider(
+                                              providers: [
+                                                BlocProvider.value(value: profileBloc),
+                                                BlocProvider.value(value: shippingAddressBloc),
+                                                BlocProvider.value(value: checkoutBloc),
+                                              ],
+                                              child: CheckoutPage(
+                                                userId: userId,
+                                                productId: product.productId!,
+                                                quantity: state.quantity,
+                                                shippingAddressId: address.id!,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                              icon: const Icon(Icons.flash_on, color: Colors.white),
+                              label: isLoaded
+                                  ? const Text("Buy Now", style: TextStyle(fontSize: 16))
+                                  : const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrange,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),
