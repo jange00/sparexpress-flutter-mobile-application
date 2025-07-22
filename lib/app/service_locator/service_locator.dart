@@ -43,6 +43,7 @@ import 'package:sparexpress/features/home/presentation/view_model/account/profil
 import 'package:sparexpress/features/home/presentation/view_model/order/order_view_model/order_bloc.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 import 'package:sparexpress/features/home/domin/use_case/product/get_product_by_id_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/delete_cart_usecase.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -201,12 +202,16 @@ Future<void> _initCartModule() async {
   serviceLocator.registerFactory<CreateCartUsecase>(
     () => CreateCartUsecase(cartRepository: serviceLocator<CartRemoteRepository>()),
   );
+  serviceLocator.registerFactory<DeleteCartUsecase>(
+    () => DeleteCartUsecase(cartRepository: serviceLocator<CartRemoteRepository>()),
+  );
 
   // Bloc
   serviceLocator.registerFactory<CartBloc>(
     () => CartBloc(
       getAllCartUsecase: serviceLocator<GetAllCartUsecase>(),
       createCartUsecase: serviceLocator<CreateCartUsecase>(),
+      deleteCartUsecase: serviceLocator<DeleteCartUsecase>(),
     ),
   );
 }

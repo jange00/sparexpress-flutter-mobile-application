@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
-// import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/cart/cart_card.dart';
 
@@ -26,7 +26,7 @@ class CartListView extends StatelessWidget {
               return CartCard(
                 item: item,
                 onRemove: () {
-                  // TODO: Add RemoveCartItem event when implemented
+                  context.read<CartBloc>().add(RemoveCartItem(item.id ?? item.productId));
                 },
               );
             },

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/create_cart_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/delete_cart_usecase.dart';
 // import 'package:sparexpress/features/home/domin/usecase/cart_usecases/get_all_cart_usecase.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
@@ -16,9 +17,14 @@ class CartView extends StatelessWidget {
   Widget build(BuildContext context) {
     final getAllCartUsecase = GetIt.instance<GetAllCartUsecase>();
     final createCartUsecase = GetIt.instance<CreateCartUsecase>();
+    final deleteCartUsecase = GetIt.instance<DeleteCartUsecase>();
 
     return BlocProvider(
-      create: (_) => CartBloc(getAllCartUsecase: getAllCartUsecase, createCartUsecase: createCartUsecase)..add(LoadCart()),
+      create: (_) => CartBloc(
+        getAllCartUsecase: getAllCartUsecase,
+        createCartUsecase: createCartUsecase,
+        deleteCartUsecase: deleteCartUsecase,
+      )..add(LoadCart()),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Your Cart'),
