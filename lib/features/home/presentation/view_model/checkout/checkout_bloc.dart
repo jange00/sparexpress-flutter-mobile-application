@@ -44,13 +44,19 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
           ? product!.price - (product!.price * product!.discount! / 100)
           : product!.price;
       final total = discountedPrice * event.quantity + product!.shippingCharge;
-      // Build summary
+      // Add product image URL if available
+      String imageUrl = '';
+      if (product!.image.isNotEmpty) {
+        imageUrl = product!.image.first.startsWith('http')
+            ? product!.image.first
+            : 'http://localhost:3000/${product!.image.first}';
+      }
       final summary = '''
 Product: ${product!.name}
 Quantity: ${event.quantity}
 Price: Rs. ${discountedPrice.toStringAsFixed(2)}
 Shipping: Rs. ${product!.shippingCharge.toStringAsFixed(2)}
-
+${imageUrl.isNotEmpty ? 'Image: $imageUrl\n' : ''}
 Shipping Address:
 ${address!.streetAddress}, ${address!.city}, ${address!.province}, ${address!.country}
 Postal Code: ${address!.postalCode}
