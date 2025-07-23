@@ -11,14 +11,21 @@ import 'package:sparexpress/features/home/presentation/widgets/account_profile/c
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/contact_us/contact_us_overlay.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/logout/logout_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/profile_header/profile_header_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/theme_toggle_card.dart';
 import 'package:sparexpress/features/splash/presentation/view/splash_view.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
+import 'package:provider/provider.dart';
+import 'package:sparexpress/app/app.dart';
 
 class AccountView extends StatelessWidget {
   const AccountView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeModeNotifier>(context);
+    final isDark = themeNotifier.themeMode == ThemeMode.dark ||
+        (themeNotifier.themeMode == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
     const String name = "Sushant Mahato";
     const String email = "sushant@example.com";
     const String phoneNumber = "+977 9800000000";
@@ -39,10 +46,25 @@ class AccountView extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.grey[100],
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          title: const Text(
+            "Settings",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.deepOrange,
+          elevation: 0.8,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(18),
+            ),
+          ),
+        ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(18.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -56,6 +78,12 @@ class AccountView extends StatelessWidget {
                   email: email,
                   phoneNumber: phoneNumber,
                   imageUrl: imageUrl,
+                ),
+                const SizedBox(height: 24),
+                // Theme toggle card
+                ThemeToggleCard(
+                  isDarkMode: isDark,
+                  onChanged: (val) => themeNotifier.toggleDark(val),
                 ),
                 const SizedBox(height: 16),
                 ChangePasswordCard(
