@@ -29,29 +29,49 @@ class _ProductViewAllScreenState extends State<ProductViewAllScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('All Products'),
+        title: const Text(
+          'All Products',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.deepOrange,
+        elevation: 0.8,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(18),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined),
+            onPressed: () {
+              // TODO: Navigate to cart page
+            },
+          ),
+        ],
       ),
-      body: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, profileState) {
-          if (profileState is! ProfileLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return BlocBuilder<ProductBloc, ProductState>(
-            builder: (context, state) {
-              if (state is ProductLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is ProductLoaded) {
-                final products = state.products;
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, profileState) {
+            if (profileState is! ProfileLoaded) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return BlocBuilder<ProductBloc, ProductState>(
+              builder: (context, state) {
+                if (state is ProductLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is ProductLoaded) {
+                  final products = state.products;
 
-                if (products.isEmpty) {
-                  return const Center(child: Text('No products available'));
-                }
+                  if (products.isEmpty) {
+                    return const Center(child: Text('No products available'));
+                  }
 
-                return Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: GridView.builder(
+                  return GridView.builder(
                     itemCount: products.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -108,15 +128,15 @@ class _ProductViewAllScreenState extends State<ProductViewAllScreen> {
                         },
                       );
                     },
-                  ),
-                );
-              } else if (state is ProductError) {
-                return Center(child: Text("Error: "+state.message));
-              }
-              return const SizedBox.shrink();
-            },
-          );
-        },
+                  );
+                } else if (state is ProductError) {
+                  return Center(child: Text("Error: "+state.message));
+                }
+                return const SizedBox.shrink();
+              },
+            );
+          },
+        ),
       ),
     );
   }
