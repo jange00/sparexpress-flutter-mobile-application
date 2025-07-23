@@ -107,32 +107,111 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
             ),
-            bottomNavigationBar: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.dashboard),
-                  label: 'Dashboard',
+            // --- Enhanced BottomNavigationBar Design with App Theme Color ---
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.receipt_long),
-                  label: 'Order',
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.10),
+                    blurRadius: 18,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.add_shopping_cart),
-                  label: 'Cart',
+                child: BottomNavigationBar(
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  showSelectedLabels: true,
+                  showUnselectedLabels: true,
+                  selectedFontSize: 14,
+                  unselectedFontSize: 13,
+                  selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.2, color: Colors.white),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0.1, color: Colors.black),
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: state.selectedIndex == 0 ? Theme.of(context).colorScheme.primary.withOpacity(0.25) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.dashboard,
+                          size: state.selectedIndex == 0 ? 32 : 26,
+                          color: state.selectedIndex == 0 ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      label: 'Dashboard',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: state.selectedIndex == 1 ? Theme.of(context).colorScheme.primary.withOpacity(0.25) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.receipt_long,
+                          size: state.selectedIndex == 1 ? 32 : 26,
+                          color: state.selectedIndex == 1 ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      label: 'Order',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: state.selectedIndex == 2 ? Theme.of(context).colorScheme.primary.withOpacity(0.25) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.add_shopping_cart,
+                          size: state.selectedIndex == 2 ? 32 : 26,
+                          color: state.selectedIndex == 2 ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      label: 'Cart',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: state.selectedIndex == 3 ? Theme.of(context).colorScheme.primary.withOpacity(0.25) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.account_circle,
+                          size: state.selectedIndex == 3 ? 32 : 26,
+                          color: state.selectedIndex == 3 ? Colors.white : Colors.black,
+                        ),
+                      ),
+                      label: 'Account',
+                    ),
+                  ],
+                  currentIndex: state.selectedIndex,
+                  selectedItemColor: Colors.white,
+                  unselectedItemColor: Colors.black,
+                  onTap: (index) {
+                    context.read<HomeViewModel>().onTapped(index);
+                  },
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.account_circle),
-                  label: 'Account',
-                ),
-              ],
-              currentIndex: state.selectedIndex,
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.black,
-              onTap: (index) {
-                context.read<HomeViewModel>().onTapped(index);
-              },
+              ),
             ),
           );
         },
