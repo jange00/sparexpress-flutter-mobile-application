@@ -66,6 +66,8 @@ dependencies:
   # khalti_flutter: ^2.2.0
   # esewa_flutter_sdk: ^1.0.0
   webview_flutter: ^4.2.2
+  proximity_sensor: ^1.0.3
+  local_auth: ^2.1.7
 
 dev_dependencies:
   flutter_test:

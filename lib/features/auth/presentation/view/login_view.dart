@@ -9,6 +9,7 @@ import 'package:sparexpress/features/auth/presentation/view_model/login_view_mod
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
+import 'package:local_auth/local_auth.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -20,6 +21,47 @@ class LoginView extends StatelessWidget {
   final ValueNotifier<bool> _showPassword = ValueNotifier(false);
 
   final _gap = const SizedBox(height: 20);
+  final LocalAuthentication _localAuth = LocalAuthentication();
+
+  Future<void> _authenticateWithBiometrics(BuildContext context) async {
+    try {
+      final canCheck = await _localAuth.canCheckBiometrics;
+      final isDeviceSupported = await _localAuth.isDeviceSupported();
+      if (!canCheck || !isDeviceSupported) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Biometric authentication not available on this device.')),
+        );
+        return;
+      }
+      final availableBiometrics = await _localAuth.getAvailableBiometrics();
+      // Require Face ID on iOS
+      if (Theme.of(context).platform == TargetPlatform.iOS &&
+          !availableBiometrics.contains(BiometricType.face)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Face ID is not available on this device.')),
+        );
+        return;
+      }
+      final didAuthenticate = await _localAuth.authenticate(
+        localizedReason: 'Please authenticate to log in',
+        options: const AuthenticationOptions(biometricOnly: true),
+      );
+      if (didAuthenticate) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Biometric authentication successful!')),
+        );
+        // TODO: You can trigger a login event here if you want to auto-login.
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Biometric authentication failed.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Biometric error: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +241,21 @@ class LoginView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(30),
                             ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.fingerprint, size: 28),
+                          label: const Text('Login with Biometrics'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          onPressed: () => _authenticateWithBiometrics(context),
                         ),
                       ),
                       const SizedBox(height: 20),
