@@ -3,14 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_event.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_item_card.dart';
 import 'package:sparexpress/features/home/presentation/widgets/AllProducts/product_view_all_screen.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_state.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_state.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:sparexpress/core/common/snackbar/my_snackbar.dart';
 
 class ProductListWidget extends StatelessWidget {
   final bool showAll;
@@ -120,7 +124,18 @@ class ProductListWidget extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => BlocProvider.value(value: serviceLocator<ProductBloc>(),child: ProductViewAllScreen(),),
+                              builder: (context) => MultiBlocProvider(
+                                providers: [
+                                  BlocProvider<ProductBloc>(
+                                    create: (_) => serviceLocator<ProductBloc>()..add(LoadProducts()),
+                                  ),
+                                  BlocProvider<ProfileBloc>(
+                                    create: (_) => serviceLocator<ProfileBloc>()..add(FetchCustomerProfile()),
+                                  ),
+                                  // CartBloc removed here to use the shared instance
+                                ],
+                                child: ProductViewAllScreen(),
+                              ),
                             ),
                           );
                         },
@@ -147,20 +162,25 @@ class ProductListWidget extends StatelessWidget {
                     return ProductItemCard(
                       product: product,
                       onAddToCart: () {
+                        final cartState = context.read<CartBloc>().state;
+                        bool alreadyInCart = false;
+                        if (cartState is CartLoaded) {
+                          alreadyInCart = cartState.items.any((item) => item.productId == product.productId);
+                        }
+                        if (alreadyInCart) {
+                          showAppSnackBar(
+                            context,
+                            message: 'Item is already in the cart!',
+                            icon: Icons.error_outline,
+                            backgroundColor: Colors.red[700],
+                          );
+                          return;
+                        }
                         // Get userId from ProfileBloc if available
                         String userId = '';
                         final profileState = context.read<ProfileBloc>().state;
                         if (profileState is ProfileLoaded) {
                           userId = profileState.customer.customerId ?? '';
-                        } else {
-                          // Optionally, show a message or fetch profile
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text('User not loaded. Please wait...'),
-                                backgroundColor: Theme.of(context).colorScheme.error,
-                              ),
-                          );
-                          return;
                         }
                         final cartEntity = CartEntity(
                           userId: userId,
@@ -171,11 +191,11 @@ class ProductListWidget extends StatelessWidget {
                           quantity: 1,
                         );
                         context.read<CartBloc>().add(CreateCart(cartEntity));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${product.name} added to cart!'),
-                              backgroundColor: const Color(0xFFFFC107),
-                            ),
+                        showAppSnackBar(
+                          context,
+                          message: '${product.name} added to cart!',
+                          icon: Icons.check_circle,
+                          backgroundColor: Colors.green[700],
                         );
                       },
                       onViewDetail: () {

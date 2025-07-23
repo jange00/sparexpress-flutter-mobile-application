@@ -15,6 +15,7 @@ import 'package:sparexpress/features/home/presentation/view_model/account/profil
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -35,7 +36,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => serviceLocator<CartBloc>(),
+      create: (_) => serviceLocator<CartBloc>()..add(LoadCart()),
       child: BlocProvider(
       create: (_) => serviceLocator<ProfileBloc>()..add(FetchCustomerProfile()),
       child: BlocBuilder<HomeViewModel, HomeState>(

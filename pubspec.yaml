@@ -63,8 +63,8 @@ dependencies:
   url_launcher: ^6.3.2
   flutter_svg: ^2.2.0
   intl: ^0.20.2
-  khalti_flutter: ^2.2.0
-  esewa_flutter_sdk: ^1.0.0
+  # khalti_flutter: ^2.2.0
+  # esewa_flutter_sdk: ^1.0.0
   webview_flutter: ^4.2.2
 
 dev_dependencies:

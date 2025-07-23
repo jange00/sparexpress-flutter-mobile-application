@@ -4,6 +4,7 @@ import 'package:sparexpress/features/home/presentation/view_model/shipping_addre
 import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_state.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+import 'package:sparexpress/features/home/presentation/widgets/dashboard_header/modern_app_bar.dart';
 
 class ShippingAddressFormPage extends StatefulWidget {
   final String userId;
@@ -71,11 +72,15 @@ class _ShippingAddressFormPageState extends State<ShippingAddressFormPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Add Shipping Address'),
-          elevation: 0,
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
+        appBar: const ModernAppBar(
+          title: 'Add Shipping Address',
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(Icons.location_on_outlined, color: Colors.white),
+            ),
+          ],
         ),
         body: SafeArea(
           child: Center(
@@ -166,8 +171,6 @@ class _ShippingAddressFormPageState extends State<ShippingAddressFormPage> {
                           height: 52,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: theme.colorScheme.onPrimary,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               textStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                             ),

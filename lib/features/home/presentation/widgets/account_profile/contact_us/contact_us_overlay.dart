@@ -215,8 +215,6 @@ class _ContactUsOverlayState extends State<ContactUsOverlay> {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           textStyle: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),

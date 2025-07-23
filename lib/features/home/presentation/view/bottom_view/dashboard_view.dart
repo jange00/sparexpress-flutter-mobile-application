@@ -24,8 +24,11 @@ class DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     // final searchController = TextEditingController();
 
-    return BlocProvider(
-      create: (_) => serviceLocator<ProfileBloc>()..add(FetchCustomerProfile()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => serviceLocator<ProfileBloc>()..add(FetchCustomerProfile())),
+        BlocProvider(create: (_) => serviceLocator<ProductBloc>()..add(const LoadProducts())),
+      ],
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -59,15 +62,9 @@ class DashboardView extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                BlocProvider<ProductBloc>(
-                  create:
-                      (_) =>
-                          serviceLocator<ProductBloc>()
-                            ..add(const LoadProducts()),
-                  child: Container(
-                    color: Colors.white.withOpacity(0.1),
-                    child: ProductListWidget(),
-                  ),
+                Container(
+                  color: Colors.white.withOpacity(0.1),
+                  child: ProductListWidget(),
                 ),
 
 

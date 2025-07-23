@@ -37,17 +37,20 @@ class RegisterViewModel extends Bloc<RegisterEvent, RegisterState> {
     result.fold(
       (l) {
         emit(state.copyWith(isLoading: false, isSuccess: false));
-        showMySnackBar(
-          context: event.context,
+        showAppSnackBar(
+          event.context,
           message: l.message,
-          color: Colors.red,
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red[700],
         );
       },
       (r) {
         emit(state.copyWith(isLoading: false, isSuccess: true));
-        showMySnackBar(
-          context: event.context,
+        showAppSnackBar(
+          event.context,
           message: "Registration Successful",
+          icon: Icons.check_circle,
+          backgroundColor: Colors.green[700],
         );
       },
     );

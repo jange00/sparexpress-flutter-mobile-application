@@ -5,18 +5,23 @@ import 'package:sparexpress/features/home/presentation/widgets/product_detail/pr
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
 
 class ProductItemCard extends StatelessWidget {
   final ProductEntity product;
   final VoidCallback onAddToCart;
   final VoidCallback onViewDetail;
   final double? width; // optional width for card
+  final bool cartLoaded;
 
   const ProductItemCard({
     super.key,
     required this.product,
     required this.onAddToCart,
     required this.onViewDetail,
+    this.cartLoaded = true,
     this.width,
   });
 
@@ -146,8 +151,6 @@ class ProductItemCard extends StatelessWidget {
                             icon: const Icon(Icons.add_shopping_cart, size: 14),
                             label: const Text("Cart", style: TextStyle(fontSize: 12)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(6),
@@ -164,17 +167,22 @@ class ProductItemCard extends StatelessWidget {
                                 MaterialPageRoute(
                                   builder: (_) => MultiBlocProvider(
                                     providers: [
-                                      BlocProvider.value(value: BlocProvider.of<ProfileBloc>(context)),
-                                      BlocProvider.value(value: BlocProvider.of<CartBloc>(context)),
+                                      BlocProvider<ProfileBloc>(
+                                        create: (_) => GetIt.instance<ProfileBloc>()..add(FetchCustomerProfile()),
+                                      ),
+                                      BlocProvider<CartBloc>(
+                                        create: (_) => GetIt.instance<CartBloc>(),
+                                      ),
                                     ],
                                     child: ProductDetailView(product: product),
                                   ),
                                 ),
                               );
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Theme.of(context).colorScheme.primary,
+                              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                               padding: const EdgeInsets.symmetric(vertical: 6),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(6),

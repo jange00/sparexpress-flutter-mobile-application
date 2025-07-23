@@ -260,8 +260,6 @@ class _ChangePasswordOverlayState extends State<ChangePasswordOverlay> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: colorScheme.primary,
-                                      foregroundColor: colorScheme.onPrimary,
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 16),
                                       shape: RoundedRectangleBorder(

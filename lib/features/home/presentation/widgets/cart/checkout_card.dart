@@ -131,7 +131,6 @@ class CheckoutSection extends StatelessWidget {
                                                       ElevatedButton.icon(
                                                         icon: const Icon(Icons.add_location_alt),
                                                         style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.deepOrange,
                                                           foregroundColor: Colors.white,
                                                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -167,7 +166,6 @@ class CheckoutSection extends StatelessWidget {
                                                     child: ElevatedButton.icon(
                                                       icon: const Icon(Icons.add_location_alt),
                                                       style: ElevatedButton.styleFrom(
-                                                        backgroundColor: Colors.deepOrange,
                                                         foregroundColor: Colors.white,
                                                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -209,9 +207,10 @@ class CheckoutSection extends StatelessWidget {
                                                               onPressed: () {
                                                                 Navigator.of(sheetContext).pop(address);
                                                               },
-                                                              style: ElevatedButton.styleFrom(
-                                                                backgroundColor: Colors.deepOrange,
-                                                                foregroundColor: Colors.white,
+                                                              style: OutlinedButton.styleFrom(
+                                                                backgroundColor: Colors.white,
+                                                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                                                side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                                                                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                                               ),
@@ -261,7 +260,6 @@ class CheckoutSection extends StatelessWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text("Check Out"),

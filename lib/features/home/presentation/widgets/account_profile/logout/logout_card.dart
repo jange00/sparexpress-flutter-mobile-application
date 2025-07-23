@@ -53,13 +53,7 @@ class LogoutCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.black87,
-                                side: const BorderSide(color: Colors.grey),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                              // Use theme's OutlinedButtonTheme
                               onPressed: () => Navigator.of(context).pop(),
                               child: const Text("Cancel"),
                             ),
@@ -67,13 +61,7 @@ class LogoutCard extends StatelessWidget {
                           const SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFC107),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                              // Use theme's ElevatedButtonTheme
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 blocContext.read<AccountBloc>().add(LogoutRequested());

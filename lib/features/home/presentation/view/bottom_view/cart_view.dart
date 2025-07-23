@@ -10,6 +10,7 @@ import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
 import 'package:sparexpress/features/home/presentation/widgets/cart/cart_items_list.dart';
 import 'package:sparexpress/features/home/presentation/widgets/cart/checkout_card.dart';
+import 'package:sparexpress/features/home/presentation/widgets/dashboard_header/modern_app_bar.dart';
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -29,9 +30,15 @@ class CartView extends StatelessWidget {
         updateCartItemUsecase: updateCartItemUsecase,
       )..add(LoadCart()),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Your Cart'),
+        appBar: const ModernAppBar(
+          title: 'Your Cart',
           centerTitle: true,
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Icon(Icons.shopping_cart_outlined, color: Colors.white),
+            ),
+          ],
         ),
         body: Column(
           children: const [

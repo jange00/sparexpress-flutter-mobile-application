@@ -658,8 +658,6 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                 )
                               : const Text("Add to Cart", style: TextStyle(fontSize: 16)),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -765,8 +763,6 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                                         ElevatedButton.icon(
                                                                           icon: const Icon(Icons.add_location_alt),
                                                                           style: ElevatedButton.styleFrom(
-                                                                            backgroundColor: Colors.deepOrange,
-                                                                            foregroundColor: Colors.white,
                                                                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                                                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                                           ),
@@ -801,8 +797,6 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                                       child: ElevatedButton.icon(
                                                                         icon: const Icon(Icons.add_location_alt),
                                                                         style: ElevatedButton.styleFrom(
-                                                                          backgroundColor: Colors.deepOrange,
-                                                                          foregroundColor: Colors.white,
                                                                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                                                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                                         ),
@@ -843,11 +837,12 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                                                 onPressed: () {
                                                                                   Navigator.of(sheetContext).pop(address);
                                                                                 },
-                                                                                style: ElevatedButton.styleFrom(
-                                                                                  backgroundColor: Colors.deepOrange,
-                                                                                  foregroundColor: Colors.white,
-                                                                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                                                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                                                style: OutlinedButton.styleFrom(
+                                                                                  backgroundColor: Colors.white,
+                                                                                  foregroundColor: Theme.of(context).colorScheme.primary,
+                                                                                  side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                                                 ),
                                                                                 child: const Text('Select'),
                                                                               ),
@@ -914,8 +909,6 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                     ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepOrange,
-                                foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),

@@ -78,10 +78,11 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
         // Handle failure case
         emit(state.copyWith(isLoading: false, isSuccess: false));
 
-        showMySnackBar(
-          context: event.context,
+        showAppSnackBar(
+          event.context,
           message: 'Invalid credentials. Please try again.',
-          color: Colors.red,
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red[700],
         );
       },
       (token) async {
@@ -93,10 +94,11 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
         bool userIdSaved = false;
         await userResult.fold(
           (failure) async {
-            showMySnackBar(
-              context: event.context,
+            showAppSnackBar(
+              event.context,
               message: 'Failed to fetch user profile. Please try again.',
-              color: Colors.red,
+              icon: Icons.error_outline,
+              backgroundColor: Colors.red[700],
             );
           },
           (user) async {
@@ -106,10 +108,11 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
               print('Saved userId: \'${user.customerId}\' to SharedPreferences');
               userIdSaved = true;
             } else {
-              showMySnackBar(
-                context: event.context,
+              showAppSnackBar(
+                event.context,
                 message: 'User ID missing in profile. Please contact support.',
-                color: Colors.red,
+                icon: Icons.error_outline,
+                backgroundColor: Colors.red[700],
               );
             }
           },
@@ -129,13 +132,11 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
         );
         // Show success toast after navigation
         Future.delayed(const Duration(milliseconds: 300), () {
-          ScaffoldMessenger.of(event.context).showSnackBar(
-            SnackBar(
-              content: const Text('Login successful!'),
-              backgroundColor: ThemeConstant.primaryColor,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
+          showAppSnackBar(
+            event.context,
+            message: 'Login successful!',
+            icon: Icons.check_circle,
+            backgroundColor: Colors.green[700],
           );
         });
       },
