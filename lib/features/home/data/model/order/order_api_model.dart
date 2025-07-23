@@ -159,7 +159,18 @@ class OrderApiModel extends Equatable {
     );
   }
 
-  Map<String, dynamic> toJson() => _$OrderApiModelToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': orderId,
+      'userId': userId,
+      'Amount': amount, // Capital A for backend
+      'shippingAddressId': shippingAddressId,
+      'orderStatus': orderStatus != null && orderStatus!.isNotEmpty
+          ? orderStatus![0].toUpperCase() + orderStatus!.substring(1)
+          : orderStatus,
+      'items': items?.map((item) => item.toJson()).toList(),
+    };
+  }
 
   factory OrderApiModel.fromEntity(OrderEntity entity) {
     return OrderApiModel(
@@ -167,7 +178,9 @@ class OrderApiModel extends Equatable {
       userId: entity.userId,
       amount: entity.amount,
       shippingAddressId: entity.shippingAddressId,
-      orderStatus: entity.orderStatus,
+      orderStatus: entity.orderStatus.isNotEmpty
+          ? entity.orderStatus[0].toUpperCase() + entity.orderStatus.substring(1)
+          : entity.orderStatus,
       items: entity.items.map((e) => OrderItemApiModel.fromEntity(e)).toList(),
     );
   }

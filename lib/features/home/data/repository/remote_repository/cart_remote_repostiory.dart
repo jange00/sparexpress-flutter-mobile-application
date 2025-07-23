@@ -51,4 +51,8 @@ class CartRemoteRepository implements ICartRepository {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }
   }
+
+  Future<void> clearCartByUserId(String userId) async {
+    await _cartRemoteDataSource.clearCartByUserId(userId);
+  }
 }

@@ -22,10 +22,10 @@ class OrderRemoteRepository implements IOrderRepository {
   }
 
   @override
-  Future<Either<Failure, void>> createOrder(OrderEntity order) async {
+  Future<Either<Failure, OrderEntity>> createOrder(OrderEntity order) async {
     try {
-      await _orderRemoteDataSource.createOrder(order);
-      return const Right(null);
+      final createdOrder = await _orderRemoteDataSource.createOrder(order);
+      return Right(createdOrder.toEntity());
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }

@@ -39,8 +39,19 @@ class PaymentRemoteDataSource implements IPaymentRemoteDataSource {
 
   @override
   Future<void> createPayment(PaymentEntity payment) async {
+    final tokenResult = await tokenSharedPrefs.getToken();
+    String? token;
+    tokenResult.fold(
+      (failure) => print("Failed to get token: ${failure.message}"),
+      (savedToken) => token = savedToken,
+    );
     final body = PaymentApiModel.fromEntity(payment).toJson();
-    await _apiService.dio.post(ApiEndpoints.createPayment, data: body);
+    print('Payment POST body: ' + body.toString());
+    await _apiService.dio.post(
+      ApiEndpoints.createPayment,
+      data: body,
+      options: Options(headers: {'authorization': 'Bearer $token'}),
+    );
   }
 
   @override

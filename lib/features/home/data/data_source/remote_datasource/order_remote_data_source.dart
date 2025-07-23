@@ -36,9 +36,23 @@ class OrderRemoteDataSource implements IOrderRemoteDataSource {
   }
 
   @override
-  Future<void> createOrder(OrderEntity order) async {
+  Future<OrderApiModel> createOrder(OrderEntity order) async {
+    final tokenResult = await tokenSharedPrefs.getToken();
+    String? token;
+    tokenResult.fold(
+      (failure) => print("Failed to get token: ${failure.message}"),
+      (savedToken) => token = savedToken,
+    );
     final body = OrderApiModel.fromEntity(order).toJson();
-    await _apiService.dio.post(ApiEndpoints.createOrder, data: body);
+    print('Order POST body: ' + body.toString());
+    final response = await _apiService.dio.post(
+      ApiEndpoints.createOrder,
+      data: body,
+      options: Options(headers: {'authorization': 'Bearer $token'}),
+    );
+    // Parse the created order from the response
+    final orderJson = response.data['order'] ?? response.data;
+    return OrderApiModel.fromJson(orderJson);
   }
 
   @override

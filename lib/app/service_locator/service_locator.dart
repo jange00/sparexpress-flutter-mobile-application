@@ -53,6 +53,10 @@ import 'package:sparexpress/features/home/domin/repository/shipping_repository.d
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/shipping_remote_data_source.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/shipping_remote_repository.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/update_cart_item_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/order/create_order_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/payment/create_payment_usecase.dart';
+import 'package:sparexpress/features/home/data/data_source/remote_datasource/payment_remote_data_source.dart';
+import 'package:sparexpress/features/home/data/repository/remote_repository/payment_remote_repository.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -68,6 +72,7 @@ Future<void> initDependencies() async {
   await _initCategoryModule();
   await _initCartModule();
   await _initOrderModule();
+  await _initPaymentModule();
   await _initShippingModule();
   await _initCheckoutModule();
   // Dashboard Profile Header
@@ -284,12 +289,32 @@ Future<void> _initOrderModule() async {
       repository: serviceLocator<OrderRemoteRepository>(),
     ),
   );
-
+  serviceLocator.registerFactory<CreateOrderUsecase>(
+    () => CreateOrderUsecase(repository: serviceLocator<OrderRemoteRepository>()),
+  );
   // Bloc
   serviceLocator.registerFactory<OrderBloc>(
     () => OrderBloc(
       getAllOrderUsecase: serviceLocator<GetAllOrderUsecase>(),
     ),
+  );
+}
+
+// Payment
+Future<void> _initPaymentModule() async {
+  // Remote Data Source
+  serviceLocator.registerFactory<PaymentRemoteDataSource>(
+    () => PaymentRemoteDataSource(
+      apiService: serviceLocator<ApiService>(),
+      tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
+    ),
+  );
+  // Repository
+  serviceLocator.registerFactory<PaymentRemoteRepository>(
+    () => PaymentRemoteRepository(paymentRemoteDataSource: serviceLocator<PaymentRemoteDataSource>()),
+  );
+  serviceLocator.registerFactory<CreatePaymentUsecase>(
+    () => CreatePaymentUsecase(repository: serviceLocator<PaymentRemoteRepository>()),
   );
 }
 
