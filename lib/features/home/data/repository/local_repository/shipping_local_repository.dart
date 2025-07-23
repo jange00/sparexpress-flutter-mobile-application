@@ -31,10 +31,10 @@ class ShippingLocalRepository implements IShippingAddressRepository {
   }
 
   @override
-  Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId() async {
+  Future<Either<Failure, List<ShippingAddressEntity>>> getShippingAddressesByUserId(String userId) async {
     try {
-      final result = await _localDataSource.getShippingAddresses();
-      return Right(result);
+      final addresses = await _localDataSource.getShippingAddressesByUserId(userId);
+      return Right(addresses);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }

@@ -41,4 +41,14 @@ class CartRemoteRepository implements ICartRepository {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> updateCartItem(String cartItemId, int quantity) async {
+    try {
+      await _cartRemoteDataSource.updateCartItem(cartItemId, quantity);
+      return const Right(null);
+    } catch (e) {
+      return Left(RemoteDatabaseFailure(message: e.toString()));
+    }
+  }
 }

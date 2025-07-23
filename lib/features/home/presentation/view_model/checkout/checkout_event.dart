@@ -1,11 +1,15 @@
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
+
 abstract class CheckoutEvent {}
 
 class StartCheckout extends CheckoutEvent {
   final String userId;
-  final String productId;
-  final int quantity;
+  final List<CartEntity> cartItems;
   final String shippingAddressId;
-  StartCheckout({required this.userId, required this.productId, required this.quantity, required this.shippingAddressId});
+  StartCheckout({required this.userId, required this.cartItems, required this.shippingAddressId});
+
+  @override
+  List<Object?> get props => [userId, cartItems, shippingAddressId];
 }
 
 class ConfirmOrder extends CheckoutEvent {

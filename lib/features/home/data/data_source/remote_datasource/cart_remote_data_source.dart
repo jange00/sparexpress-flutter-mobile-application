@@ -111,22 +111,29 @@ class CartRemoteDataSource implements ICartRemoteDataSource {
     throw UnimplementedError();
   }
 
-  // @override
-  // Future<void> clearCartByUserId(String userId) async {
-  //   try {
-  //     final endpoint = ApiEndpoints.deleteCartById.replaceFirst(':userId', userId);
-
-  //     final response = await _apiService.dio.delete(endpoint);
-
-  //     if (response.statusCode != 200) {
-  //       throw Exception("Failed to clear cart: ${response.statusMessage}");
-  //     }
-  //   } on DioException catch (e) {
-  //     print('Dio error: ${e.response?.data ?? e.message}');
-  //     throw Exception(e.message ?? 'DioException occurred');
-  //   } catch (e) {
-  //     print('Unhandled error: $e');
-  //     throw Exception("Unhandled exception: ${e.toString()}");
-  //   }
-  // }
+  Future<void> updateCartItem(String cartItemId, int quantity) async {
+    try {
+      final tokenResult = await tokenSharedPrefs.getToken();
+      String? token;
+      tokenResult.fold(
+        (failure) => print("Failed to get token: ${failure.message}"),
+        (savedToken) => token = savedToken,
+      );
+      final endpoint = ApiEndpoints.deleteCart.replaceFirst(':cartItemId', cartItemId);
+      final response = await _apiService.dio.put(
+        endpoint,
+        data: { 'quantity': quantity },
+        options: Options(headers: { 'authorization': token != null ? 'Bearer $token' : '' }),
+      );
+      if (response.statusCode != 200) {
+        throw Exception("Failed to update cart item: ${response.statusMessage}");
+      }
+    } on DioException catch (e) {
+      print('Dio error: ${e.response?.data ?? e.message}');
+      throw Exception(e.message ?? 'DioException occurred');
+    } catch (e) {
+      print('Unhandled error: ${e.toString()}');
+      throw Exception("Unhandled exception: ${e.toString()}");
+    }
+  }
 }

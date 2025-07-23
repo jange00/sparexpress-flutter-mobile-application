@@ -39,4 +39,19 @@ class CartLocalRepository implements ICartRepository {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
+
+  Future<Either<Failure, List<CartEntity>>> getCartsByUserId(String userId) async {
+    try {
+      final carts = await _cartLocalDataSource.getCartsByUserId(userId);
+      return Right(carts);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateCartItem(String cartId, int quantity) async {
+    // TODO: Implement updateCartItem in CartLocalDataSource and call it here
+    return Left(LocalDatabaseFailure(message: 'updateCartItem not implemented'));
+  }
 }

@@ -5,6 +5,7 @@ import 'package:sparexpress/features/home/domin/use_case/product/get_product_by_
 import 'package:sparexpress/features/home/domin/use_case/shipping/get_all_shipping_addresses_usecase.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 
 class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   final GetProductByIdUsecase getProductByIdUsecase;
@@ -18,11 +19,6 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   Future<void> _onStartCheckout(StartCheckout event, Emitter emit) async {
     emit(CheckoutLoading());
     try {
-      // Fetch product
-      final productResult = await getProductByIdUsecase(event.productId);
-      ProductEntity? product;
-      productResult.fold((failure) => product = null, (p) => product = p);
-      // Fetch shipping address (get all, then find by id)
       final addressResult = await getAllShippingAddressUsecase(event.userId);
       ShippingAddressEntity? address;
       addressResult.fold(
@@ -35,33 +31,51 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
           }
         },
       );
-      if (product == null || address == null) {
-        emit(CheckoutError('Could not fetch product or address details.'));
+      if (address == null) {
+        emit(CheckoutError('Could not fetch address details.'));
         return;
       }
-      // Calculate totals
-      final discountedPrice = (product!.discount != null && product!.discount! > 0)
-          ? product!.price - (product!.price * product!.discount! / 100)
-          : product!.price;
-      final total = discountedPrice * event.quantity + product!.shippingCharge;
-      // Add product image URL if available
-      String imageUrl = '';
-      if (product!.image.isNotEmpty) {
-        imageUrl = product!.image.first.startsWith('http')
-            ? product!.image.first
-            : 'http://localhost:3000/${product!.image.first}';
-      }
-      final summary = '''
+      double subtotal = 0.0;
+      double totalShipping = 0.0;
+      String productsSummary = '';
+      for (final cartItem in event.cartItems) {
+        final productResult = await getProductByIdUsecase(cartItem.productId);
+        ProductEntity? product;
+        productResult.fold((failure) => product = null, (p) => product = p);
+        if (product == null) {
+          emit(CheckoutError('Could not fetch details for product: ${cartItem.name}'));
+          return;
+        }
+        final discountedPrice = (product!.discount != null && product!.discount! > 0)
+            ? product!.price - (product!.price * product!.discount! / 100)
+            : product!.price;
+        subtotal += discountedPrice * cartItem.quantity;
+        totalShipping += product!.shippingCharge * cartItem.quantity;
+        String imageUrl = '';
+        if (product!.image.isNotEmpty) {
+          imageUrl = product!.image.first.startsWith('http')
+              ? product!.image.first
+              : 'http://localhost:3000/${product!.image.first}';
+        }
+        productsSummary += '''
 Product: ${product!.name}
-Quantity: ${event.quantity}
+Quantity: ${cartItem.quantity}
 Price: Rs. ${discountedPrice.toStringAsFixed(2)}
 Shipping: Rs. ${product!.shippingCharge.toStringAsFixed(2)}
 ${imageUrl.isNotEmpty ? 'Image: $imageUrl\n' : ''}
+''';
+      }
+      final grandTotal = subtotal + totalShipping;
+      final summary = '''
+Order Details:
+$productsSummary
 Shipping Address:
 ${address!.streetAddress}, ${address!.city}, ${address!.province}, ${address!.country}
 Postal Code: ${address!.postalCode}
 
-Total: Rs. ${total.toStringAsFixed(2)}
+Subtotal: Rs. ${subtotal.toStringAsFixed(2)}
+Total Shipping: Rs. ${totalShipping.toStringAsFixed(2)}
+Total: Rs. ${grandTotal.toStringAsFixed(2)}
 ''';
       emit(CheckoutReady(summary));
     } catch (e) {

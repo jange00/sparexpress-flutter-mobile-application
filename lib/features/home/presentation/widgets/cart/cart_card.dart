@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
 
 class CartCard extends StatelessWidget {
   final CartEntity item;
@@ -66,9 +69,29 @@ class CartCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 14, color: Colors.black87),
                   ),
                   const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline),
+                        splashRadius: 18,
+                        onPressed: item.quantity > 1
+                            ? () {
+                                context.read<CartBloc>().add(UpdateCartItem(cartItemId: item.id ?? item.productId, quantity: item.quantity - 1));
+                              }
+                            : null,
+                      ),
                   Text(
-                    'Quantity: ${item.quantity}',
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        '${item.quantity}',
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline),
+                        splashRadius: 18,
+                        onPressed: () {
+                          context.read<CartBloc>().add(UpdateCartItem(cartItemId: item.id ?? item.productId, quantity: item.quantity + 1));
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

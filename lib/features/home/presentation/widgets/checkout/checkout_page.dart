@@ -5,30 +5,56 @@ import 'package:sparexpress/features/home/presentation/view_model/checkout/check
 import 'package:sparexpress/features/home/presentation/view_model/checkout/checkout_state.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
 
 class CheckoutPage extends StatefulWidget {
   final String userId;
-  final String productId;
-  final int quantity;
+  final List<CartEntity> cartItems;
   final String shippingAddressId;
 
-  const CheckoutPage({super.key, required this.userId, required this.productId, required this.quantity, required this.shippingAddressId});
+  const CheckoutPage({
+    super.key,
+    required this.userId,
+    required this.cartItems,
+    required this.shippingAddressId,
+  });
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  String _selectedPayment = 'esewa';
+  final List<Map<String, dynamic>> _paymentMethods = [
+    {
+      'key': 'esewa',
+      'label': 'eSewa',
+      'icon': Icons.account_balance_wallet,
+      'color': Color(0xFF1EB564),
+    },
+    {
+      'key': 'khalti',
+      'label': 'Khalti',
+      'icon': Icons.account_balance,
+      'color': Color(0xFF5F259F),
+    },
+    {
+      'key': 'bank',
+      'label': 'Bank',
+      'icon': Icons.account_balance_outlined,
+      'color': Color(0xFF1565C0),
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
-    // Dispatch StartCheckout event after widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CheckoutBloc>().add(StartCheckout(
         userId: widget.userId,
-        productId: widget.productId,
-        quantity: widget.quantity,
+        cartItems: widget.cartItems,
         shippingAddressId: widget.shippingAddressId,
       ));
     });
@@ -48,82 +74,117 @@ class _CheckoutPageState extends State<CheckoutPage> {
           if (state is CheckoutLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is CheckoutReady) {
-            // Parse the summary string for display (or, ideally, pass a model)
+            // Parse the summary string for all products and order info
             final lines = state.summary.split('\n');
-            String productName = '', productPrice = '', shipping = '', quantity = '', total = '', address = '', postal = '', productImageUrl = '';
+            List<Map<String, String>> products = [];
+            Map<String, String> currentProduct = {};
+            String address = '', postal = '', subtotal = '', totalShipping = '', total = '';
+            bool inProductSection = false;
+            bool inAddressSection = false;
             for (final line in lines) {
-              if (line.startsWith('Product:')) productName = line.replaceFirst('Product:', '').trim();
-              if (line.startsWith('Price:')) productPrice = line.replaceFirst('Price:', '').trim();
-              if (line.startsWith('Shipping:')) shipping = line.replaceFirst('Shipping:', '').trim();
-              if (line.startsWith('Quantity:')) quantity = line.replaceFirst('Quantity:', '').trim();
-              if (line.startsWith('Total:')) total = line.replaceFirst('Total:', '').trim();
-              if (line.startsWith('Shipping Address:')) address = '';
-              if (address != '' && line.trim().isNotEmpty && !line.startsWith('Postal Code:')) address += '\n' + line.trim();
-              if (line.startsWith('Postal Code:')) postal = line.replaceFirst('Postal Code:', '').trim();
-              if (line.startsWith('Image:')) productImageUrl = line.replaceFirst('Image:', '').trim();
-              if (line.startsWith('Shipping Address:')) address = '';
+              if (line.startsWith('Product:')) {
+                if (currentProduct.isNotEmpty) {
+                  products.add(Map<String, String>.from(currentProduct));
+                  currentProduct.clear();
+                }
+                currentProduct['name'] = line.replaceFirst('Product:', '').trim();
+                inProductSection = true;
+                inAddressSection = false;
+              } else if (inProductSection && line.startsWith('Quantity:')) {
+                currentProduct['quantity'] = line.replaceFirst('Quantity:', '').trim();
+              } else if (inProductSection && line.startsWith('Price:')) {
+                currentProduct['price'] = line.replaceFirst('Price:', '').trim();
+              } else if (inProductSection && line.startsWith('Shipping:')) {
+                currentProduct['shipping'] = line.replaceFirst('Shipping:', '').trim();
+              } else if (inProductSection && line.startsWith('Image:')) {
+                currentProduct['image'] = line.replaceFirst('Image:', '').trim();
+              } else if (line.trim().isEmpty && inProductSection) {
+                if (currentProduct.isNotEmpty) {
+                  products.add(Map<String, String>.from(currentProduct));
+                  currentProduct.clear();
+                }
+                inProductSection = false;
+              } else if (line.startsWith('Shipping Address:')) {
+                inProductSection = false;
+                inAddressSection = true;
+                address = '';
+              } else if (inAddressSection && line.startsWith('Postal Code:')) {
+                postal = line.replaceFirst('Postal Code:', '').trim();
+                inAddressSection = false;
+              } else if (inAddressSection && line.trim().isNotEmpty) {
+                address += (address.isEmpty ? '' : '\n') + line.trim();
+              } else if (line.startsWith('Subtotal:')) {
+                subtotal = line.replaceFirst('Subtotal:', '').trim();
+              } else if (line.startsWith('Total Shipping:')) {
+                totalShipping = line.replaceFirst('Total Shipping:', '').trim();
+              } else if (line.startsWith('Total:')) {
+                total = line.replaceFirst('Total:', '').trim();
+              }
             }
-            // Fallbacks
-            if (address.isEmpty) address = lines.where((l) => l.contains(',')).join('\n');
+            if (currentProduct.isNotEmpty) {
+              products.add(Map<String, String>.from(currentProduct));
+            }
             return SingleChildScrollView(
               padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Product Card
-                  Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: productImageUrl.isNotEmpty
-                                ? CachedNetworkImage(
-                                    imageUrl: productImageUrl,
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.cover,
-                                    placeholder: (_, __) => Container(
-                                      width: 70,
-                                      height: 70,
-                                      color: Colors.grey[200],
-                                      child: const Icon(Icons.shopping_bag, size: 36, color: Colors.deepOrange),
-                                    ),
-                                    errorWidget: (_, __, ___) => Container(
-                                      width: 70,
-                                      height: 70,
-                                      color: Colors.grey[200],
-                                      child: const Icon(Icons.broken_image, size: 36, color: Colors.grey),
-                                    ),
-                                  )
-                                : Container(
-                                    width: 70,
-                                    height: 70,
-                                    color: Colors.grey[100],
-                                    child: const Icon(Icons.shopping_bag, size: 36, color: Colors.deepOrange),
-                                  ),
+                  // Product Cards
+                  ...products.map((product) => Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        margin: const EdgeInsets.only(bottom: 14),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: product['image'] != null && product['image']!.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: product['image']!,
+                                        width: 70,
+                                        height: 70,
+                                        fit: BoxFit.cover,
+                                        placeholder: (_, __) => Container(
+                                          width: 70,
+                                          height: 70,
+                                          color: Colors.grey[200],
+                                          child: const Icon(Icons.shopping_bag, size: 36, color: Colors.deepOrange),
+                                        ),
+                                        errorWidget: (_, __, ___) => Container(
+                                          width: 70,
+                                          height: 70,
+                                          color: Colors.grey[200],
+                                          child: const Icon(Icons.broken_image, size: 36, color: Colors.grey),
+                                        ),
+                                      )
+                                    : Container(
+                                        width: 70,
+                                        height: 70,
+                                        color: Colors.grey[100],
+                                        child: const Icon(Icons.shopping_bag, size: 36, color: Colors.deepOrange),
+                                      ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(product['name'] ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 4),
+                                    Text(product['price'] ?? '', style: const TextStyle(fontSize: 15, color: Colors.deepOrange)),
+                                    const SizedBox(height: 2),
+                                    Text('Quantity: ${product['quantity'] ?? ''}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                                    if (product['shipping'] != null && product['shipping']!.isNotEmpty)
+                                      Text('Shipping: ${product['shipping']}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(productName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text(productPrice, style: const TextStyle(fontSize: 15, color: Colors.deepOrange)),
-                                const SizedBox(height: 2),
-                                Text('Quantity: $quantity', style: const TextStyle(fontSize: 13, color: Colors.grey)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
+                        ),
+                      )),
                   // Shipping Address Card
                   Card(
                     elevation: 2,
@@ -167,7 +228,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Subtotal', style: TextStyle(fontSize: 15)),
-                              Text(productPrice, style: const TextStyle(fontSize: 15)),
+                              Text(subtotal, style: const TextStyle(fontSize: 15)),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -175,7 +236,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Shipping', style: TextStyle(fontSize: 15)),
-                              Text(shipping, style: const TextStyle(fontSize: 15)),
+                              Text(totalShipping, style: const TextStyle(fontSize: 15)),
                             ],
                           ),
                           const Divider(height: 24),
@@ -191,12 +252,57 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ),
                   const SizedBox(height: 28),
+                  // Payment Method Selection
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: _paymentMethods.map((method) {
+                            final isSelected = _selectedPayment == method['key'];
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedPayment = method['key'];
+                                });
+                              },
+                              child: Card(
+                                color: isSelected ? method['color'].withOpacity(0.15) : Colors.white,
+                                elevation: isSelected ? 4 : 1,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color: isSelected ? method['color'] : Colors.grey.shade300,
+                                    width: isSelected ? 2 : 1,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                                  child: Column(
+                                    children: [
+                                      Icon(method['icon'], color: method['color'], size: 32),
+                                      const SizedBox(height: 6),
+                                      Text(method['label'], style: TextStyle(fontWeight: FontWeight.w600, color: isSelected ? method['color'] : Colors.black87)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
                   // Confirm Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        context.read<CheckoutBloc>().add(ConfirmOrder('cod'));
+                        context.read<CheckoutBloc>().add(ConfirmOrder(_selectedPayment));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepOrange,

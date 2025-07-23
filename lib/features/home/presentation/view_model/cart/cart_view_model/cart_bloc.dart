@@ -58,6 +58,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/get_all_cart_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/create_cart_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/cart/delete_cart_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/update_cart_item_usecase.dart';
 // import 'package:sparexpress/features/home/domin/usecase/cart_usecases/get_all_cart_usecase.dart';
 
 import 'cart_event.dart';
@@ -67,11 +68,18 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   final GetAllCartUsecase getAllCartUsecase;
   final CreateCartUsecase createCartUsecase;
   final DeleteCartUsecase deleteCartUsecase;
+  final UpdateCartItemUsecase updateCartItemUsecase;
 
-  CartBloc({required this.getAllCartUsecase, required this.createCartUsecase, required this.deleteCartUsecase}) : super(CartInitial()) {
+  CartBloc({
+    required this.getAllCartUsecase,
+    required this.createCartUsecase,
+    required this.deleteCartUsecase,
+    required this.updateCartItemUsecase,
+  }) : super(CartInitial()) {
     on<LoadCart>(_onLoadCart);
     on<CreateCart>(_onCreateCart);
     on<RemoveCartItem>(_onRemoveCartItem);
+    on<UpdateCartItem>(_onUpdateCartItem);
   }
 
   Future<void> _onLoadCart(LoadCart event, Emitter<CartState> emit) async {
@@ -84,10 +92,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       (cartItems) {
         final total = cartItems.fold<double>(
           0.0,
-          (sum, item) {
-            // TODO: calculate actual total from CartEntity fields (e.g. price * quantity)
-            return sum + 0;
-          },
+          (sum, item) => sum + (item.price * item.quantity),
         );
         emit(CartLoaded(items: cartItems, total: total));
       },
@@ -110,6 +115,27 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       (failure) => emit(CartError(failure.message)),
       (_) async {
         // Reload cart after deletion
+        final cartResult = await getAllCartUsecase();
+        cartResult.fold(
+          (failure) => emit(CartError(failure.message)),
+          (cartItems) {
+            final total = cartItems.fold<double>(
+              0.0,
+              (sum, item) => sum + (item.price * item.quantity),
+            );
+            emit(CartLoaded(items: cartItems, total: total));
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _onUpdateCartItem(UpdateCartItem event, Emitter<CartState> emit) async {
+    emit(CartLoading());
+    final result = await updateCartItemUsecase(event.cartItemId, event.quantity);
+    result.fold(
+      (failure) => emit(CartError(failure.message)),
+      (_) async {
         final cartResult = await getAllCartUsecase();
         cartResult.fold(
           (failure) => emit(CartError(failure.message)),

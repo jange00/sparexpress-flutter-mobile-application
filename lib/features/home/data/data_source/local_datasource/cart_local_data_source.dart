@@ -38,4 +38,15 @@ class CartLocalDataSource implements ICartDataSource {
       throw LocalDatabaseFailure(message: e.toString());
     }
   }
+
+  Future<List<CartEntity>> getCartsByUserId(String userId) async {
+    try {
+      final cartHiveModels = await _hiveService.getAllCarts();
+      return CartHiveModel.toEntityList(cartHiveModels)
+          .where((cart) => cart.userId == userId)
+          .toList();
+    } catch (e) {
+      throw LocalDatabaseFailure(message: e.toString());
+    }
+  }
 }

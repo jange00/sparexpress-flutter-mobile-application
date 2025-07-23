@@ -6,4 +6,5 @@ abstract interface class ICartRepository {
   Future<Either<Failure, List<CartEntity>>> getCarts();
   Future<Either<Failure, void>> createCart(CartEntity cart);
   Future<Either<Failure, void>> deleteCart(String id);
+  Future<Either<Failure, void>> updateCartItem(String cartItemId, int quantity);
 }

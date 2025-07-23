@@ -52,6 +52,7 @@ import 'package:sparexpress/features/home/presentation/view_model/checkout/check
 import 'package:sparexpress/features/home/domin/repository/shipping_repository.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/shipping_remote_data_source.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/shipping_remote_repository.dart';
+import 'package:sparexpress/features/home/domin/use_case/cart/update_cart_item_usecase.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -216,12 +217,17 @@ Future<void> _initCartModule() async {
     () => DeleteCartUsecase(cartRepository: serviceLocator<CartRemoteRepository>()),
   );
 
+  serviceLocator.registerFactory<UpdateCartItemUsecase>(
+    () => UpdateCartItemUsecase(serviceLocator<CartRemoteRepository>()),
+  );
+
   // Bloc
   serviceLocator.registerFactory<CartBloc>(
     () => CartBloc(
       getAllCartUsecase: serviceLocator<GetAllCartUsecase>(),
       createCartUsecase: serviceLocator<CreateCartUsecase>(),
       deleteCartUsecase: serviceLocator<DeleteCartUsecase>(),
+      updateCartItemUsecase: serviceLocator<UpdateCartItemUsecase>(),
     ),
   );
 }

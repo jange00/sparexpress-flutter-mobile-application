@@ -39,4 +39,16 @@ class ShippingAddressLocalDataSource implements IShippingAddressDataSource {
       throw LocalDatabaseFailure(message: e.toString());
     }
   }
+
+  Future<List<ShippingAddressEntity>> getShippingAddressesByUserId(String userId) async {
+    try {
+      final hiveModels = await _hiveService.getAllShippingAddresses();
+      return hiveModels
+          .map((e) => e.toEntity())
+          .where((address) => address.userId == userId)
+          .toList();
+    } catch (e) {
+      throw LocalDatabaseFailure(message: e.toString());
+    }
+  }
 }

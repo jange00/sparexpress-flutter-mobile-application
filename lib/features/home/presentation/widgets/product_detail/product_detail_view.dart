@@ -19,6 +19,7 @@ import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/checkout/checkout_bloc.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 import 'package:flutter/services.dart';
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 
 
 class ProductDetailView extends StatelessWidget {
@@ -872,8 +873,14 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                               ],
                                               child: CheckoutPage(
                                                 userId: userId,
-                                                productId: product.productId!,
-                                                quantity: state.quantity,
+                                                cartItems: [CartEntity(
+                                                  userId: userId,
+                                                  productId: product.productId!,
+                                                  name: product.name,
+                                                  imageUrl: product.image.isNotEmpty ? (product.image.first.startsWith('http') ? product.image.first : 'http://localhost:3000/${product.image.first}') : '',
+                                                  price: product.price,
+                                                  quantity: state.quantity,
+                                                )],
                                                 shippingAddressId: address.id!,
                                               ),
                                             ),
