@@ -57,6 +57,7 @@ import 'package:sparexpress/features/home/domin/use_case/order/create_order_usec
 import 'package:sparexpress/features/home/domin/use_case/payment/create_payment_usecase.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/payment_remote_data_source.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/payment_remote_repository.dart';
+import 'package:sparexpress/features/home/domin/use_case/payment/get_all_payment_usecase.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -315,6 +316,9 @@ Future<void> _initPaymentModule() async {
   );
   serviceLocator.registerFactory<CreatePaymentUsecase>(
     () => CreatePaymentUsecase(repository: serviceLocator<PaymentRemoteRepository>()),
+  );
+  serviceLocator.registerFactory<GetAllPaymentUsecase>(
+    () => GetAllPaymentUsecase(repository: serviceLocator<PaymentRemoteRepository>()),
   );
 }
 

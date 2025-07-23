@@ -16,6 +16,11 @@ import 'package:sparexpress/features/splash/presentation/view/splash_view.dart';
 import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:sparexpress/app/app.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/payment/payment_card.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/payment_view_model/payment_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/payment_view_model/payment_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/payment_view_model/payment_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/payment/payment_overlay.dart';
 
 class AccountView extends StatelessWidget {
   const AccountView({super.key});
@@ -103,6 +108,16 @@ class AccountView extends StatelessWidget {
                       // We don't want the user to accidentally dismiss it while typing or loading
                       barrierDismissible: false,
                       builder: (context) => const ContactUsOverlay(),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                PaymentCard(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (_) => const PaymentOverlay(),
                     );
                   },
                 ),

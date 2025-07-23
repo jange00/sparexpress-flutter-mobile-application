@@ -7,6 +7,7 @@ class PaymentEntity extends Equatable {
   final double amount;
   final String paymentMethod;
   final String paymentStatus;
+  final String? createdAt;
 
   const PaymentEntity({
     this.paymentId,
@@ -15,6 +16,7 @@ class PaymentEntity extends Equatable {
     required this.amount,
     required this.paymentMethod,
     required this.paymentStatus,
+    this.createdAt,
   });
 
   @override
@@ -25,5 +27,6 @@ class PaymentEntity extends Equatable {
         amount,
         paymentMethod,
         paymentStatus,
+        createdAt,
       ];
 }
