@@ -16,6 +16,7 @@ import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_state.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -180,10 +181,48 @@ class _HomeViewState extends State<HomeView> {
                           color: state.selectedIndex == 2 ? Theme.of(context).colorScheme.primary.withOpacity(0.25) : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Icon(
-                          Icons.add_shopping_cart,
-                          size: state.selectedIndex == 2 ? 32 : 26,
-                          color: state.selectedIndex == 2 ? Colors.white : Colors.black,
+                        child: BlocBuilder<CartBloc, CartState>(
+                          builder: (context, cartState) {
+                            int cartCount = 0;
+                            if (cartState is CartLoaded) {
+                              cartCount = cartState.items.length;
+                            }
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Icon(
+                                  Icons.add_shopping_cart,
+                                  size: state.selectedIndex == 2 ? 32 : 26,
+                                  color: state.selectedIndex == 2 ? Colors.white : Colors.black,
+                                ),
+                                if (cartCount > 0)
+                                  Positioned(
+                                    right: -2,
+                                    top: -2,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 18,
+                                        minHeight: 18,
+                                      ),
+                                      child: Text(
+                                        '$cartCount',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                       label: 'Cart',

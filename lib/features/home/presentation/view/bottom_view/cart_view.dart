@@ -22,13 +22,8 @@ class CartView extends StatelessWidget {
     final deleteCartUsecase = GetIt.instance<DeleteCartUsecase>();
     final updateCartItemUsecase = GetIt.instance<UpdateCartItemUsecase>();
 
-    return BlocProvider(
-      create: (_) => CartBloc(
-        getAllCartUsecase: getAllCartUsecase,
-        createCartUsecase: createCartUsecase,
-        deleteCartUsecase: deleteCartUsecase,
-        updateCartItemUsecase: updateCartItemUsecase,
-      )..add(LoadCart()),
+    return BlocProvider.value(
+      value: BlocProvider.of<CartBloc>(context),
       child: Scaffold(
         appBar: const ModernAppBar(
           title: 'Your Cart',

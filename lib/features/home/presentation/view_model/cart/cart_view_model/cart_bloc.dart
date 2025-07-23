@@ -104,32 +104,31 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     final result = await createCartUsecase(event.cart);
     result.fold(
       (failure) => emit(CartError(failure.message)),
-      (_) => emit(CartCreated()),
+      (_) async {
+        emit(CartCreated());
+        // Immediately reload the cart for up-to-date state
+        add(LoadCart());
+      },
     );
   }
 
   Future<void> _onRemoveCartItem(RemoveCartItem event, Emitter<CartState> emit) async {
-    emit(CartLoading());
+    if (state is CartLoaded) {
+      final current = state as CartLoaded;
+      final updatedItems = current.items.where((item) => item.productId != event.productId).toList();
+      final updatedTotal = updatedItems.fold(0.0, (sum, item) => sum + item.price * item.quantity);
+      // Emit updated state immediately for instant UI update
+      emit(CartLoaded(items: updatedItems, total: updatedTotal));
+    }
+    // Then perform the backend removal
     final result = await deleteCartUsecase(event.productId);
     await result.fold(
       (failure) async {
         emit(CartError(failure.message));
       },
       (_) async {
-        // Reload cart after deletion
-        final cartResult = await getAllCartUsecase();
-        await cartResult.fold(
-          (failure) async {
-            emit(CartError(failure.message));
-          },
-          (cartItems) async {
-            final total = cartItems.fold<double>(
-              0.0,
-              (sum, item) => sum + (item.price * item.quantity),
-            );
-            emit(CartLoaded(items: cartItems, total: total));
-          },
-        );
+        // Optionally reload from backend to ensure consistency
+        add(LoadCart());
       },
     );
   }
