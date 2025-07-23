@@ -6,6 +6,16 @@ import 'package:sparexpress/features/home/presentation/view_model/dashboard/dico
 // import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
 // import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_event.dart';
 import 'package:sparexpress/features/home/presentation/widgets/discounted_products/offer_item_card.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/cart/cart_view_model/cart_event.dart';
+import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
+import 'package:sparexpress/core/common/snackbar/my_snackbar.dart';
+import 'package:sparexpress/features/home/presentation/widgets/product_detail/product_detail_view.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
+
 
 class OfferViewAllScreen extends StatefulWidget {
   const OfferViewAllScreen({super.key});
@@ -55,10 +65,17 @@ class _OfferViewAllScreenState extends State<OfferViewAllScreen> {
                   return OfferItemCard(
                     product: product,
                     onTap: () {
-                      Navigator.pushNamed(
+                      Navigator.push(
                         context,
-                        '/product-detail',
-                        arguments: product,
+                        MaterialPageRoute(
+                          builder: (_) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider(create: (_) => serviceLocator<ProfileBloc>()..add(FetchCustomerProfile())),
+                              BlocProvider(create: (_) => serviceLocator<CartBloc>()..add(LoadCart())),
+                            ],
+                            child: ProductDetailView(product: product),
+                          ),
+                        ),
                       );
                     },
                   );
