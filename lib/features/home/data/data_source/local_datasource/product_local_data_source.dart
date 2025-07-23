@@ -38,4 +38,17 @@ class ProductLocalDataSource implements IProductDataSource {
       throw LocalDatabaseFailure(message: e.toString());
     }
   }
+
+  @override
+  Future<ProductEntity> getProductById(String id) async {
+    try {
+      final productHiveModel = await _hiveService.getProductById(id);
+      if (productHiveModel == null) {
+        throw LocalDatabaseFailure(message: 'Product not found');
+      }
+      return productHiveModel.toEntity();
+    } catch (e) {
+      throw LocalDatabaseFailure(message: e.toString());
+    }
+  }
 }

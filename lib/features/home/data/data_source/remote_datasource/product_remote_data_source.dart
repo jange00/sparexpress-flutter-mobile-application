@@ -6,83 +6,44 @@ import 'package:sparexpress/features/home/data/model/all_product/product_api_mod
 import 'package:sparexpress/features/home/data/data_source/product_data_source.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 
-class ProductRemoteDataSource implements IProductDataSource {
+abstract class IProductRemoteDataSource {
+  Future<List<ProductEntity>> getProducts();
+  Future<ProductEntity> getProductById(String id);  // Add this line
+}
+
+class ProductRemoteDataSource implements IProductRemoteDataSource {
   final ApiService _apiService;
 
   ProductRemoteDataSource({required ApiService apiService})
       : _apiService = apiService;
 
-@override
-Future<List<ProductEntity>> getProducts() async {
-  try {
-    final response = await _apiService.dio.get(ApiEndpoints.getAllProducts);
-    print("API Response: ${response.data}");
-
-    if (response.statusCode == 200 && response.data != null) {
-      try {
-        final List<ProductEntity> entities = ProductApiModel.fromJsonList(response.data['data']);
-;
-        // final dto = GetAllProductDTO.fromJson(response.data);
-        return entities;
-      } catch (e) {
-        throw Exception("Parsing error: ${e.toString()}");
+  @override
+  Future<List<ProductEntity>> getProducts() async {
+    try {
+      final response = await _apiService.dio.get(ApiEndpoints.getAllProducts);
+      if (response.statusCode == 200) {
+        final List<ProductApiModel> products = (response.data['data'] as List)
+            .map((e) => ProductApiModel.fromJson(e))
+            .toList();
+        return products.map((e) => e.toEntity()).toList();
       }
-    } else {
-      throw Exception("Failed: ${response.statusMessage ?? 'Unknown error'}");
+      throw Exception('Failed to load products');
+    } catch (e) {
+      throw Exception('Failed to load products: $e');
     }
-  } on DioException catch (e) {
-    throw Exception(e.message ?? 'DioException occurred');
-  } catch (e) {
-    throw Exception("Unhandled exception: ${e.toString()}");
   }
-}
-  
+
   @override
-  Future<void> createProduct(ProductEntity product) {
-    // TODO: implement createProduct
-    throw UnimplementedError();
+  Future<ProductEntity> getProductById(String id) async {
+    try {
+      final response = await _apiService.dio.get('${ApiEndpoints.getAllProducts}/$id');
+      if (response.statusCode == 200) {
+        final ProductApiModel product = ProductApiModel.fromJson(response.data['data']);
+        return product.toEntity();
+      }
+      throw Exception('Failed to load product');
+    } catch (e) {
+      throw Exception('Failed to load product: $e');
+    }
   }
-  
-  @override
-  Future<void> deleteProduct(String id) {
-    // TODO: implement deleteProduct
-    throw UnimplementedError();
-  }
-
-  // Add if needed later
-//   @override
-//   Future<void> createProduct(ProductEntity product) async {
-//     try {
-//       final model = ProductApiModel.fromEntity(product);
-//       final response = await _apiService.dio.post(
-//         ApiEndpoints.createProduct,
-//         data: model.toJson(),
-//       );
-
-//       if (response.statusCode != 201) {
-//         throw Exception(response.statusMessage);
-//       }
-//     } on DioException catch (e) {
-//       throw Exception(e.message ?? 'Dio error');
-//     } catch (e) {
-//       throw Exception(e.toString());
-//     }
-//   }
-
-//   @override
-//   Future<void> deleteProduct(String productId) async {
-//     try {
-//       final response = await _apiService.dio.delete(
-//         '${ApiEndpoints.deleteProduct}/$productId',
-//       );
-
-//       if (response.statusCode != 204) {
-//         throw Exception(response.statusMessage);
-//       }
-//     } on DioException catch (e) {
-//       throw Exception(e.message ?? 'Dio error');
-//     } catch (e) {
-//       throw Exception(e.toString());
-//     }
-//   }
 }

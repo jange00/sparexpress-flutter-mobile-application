@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/widgets/category/category_list_widget.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/category_view_model/category_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_state.dart';
 import 'package:sparexpress/features/home/domin/entity/category_entity.dart';
 
 class MockCategoryBloc extends Mock implements CategoryBloc {}

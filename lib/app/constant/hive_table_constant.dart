@@ -9,4 +9,18 @@ class HiveTableConstant {
 
   static const int categoryId = 2;
   static const String categoryBox = 'categoryBox';
+
+  static const int cartId = 3;
+  static const String cartBox = 'cartBox';
+
+  static const int shippingId = 4;
+  static const String shippingBox = 'shippingBox';
+
+  static const int orderId = 5;
+  static const String orderBox = 'orderBox';
+
+  static const int orderItemId = 6;
+  
+  static const int paymentId = 7;
+  static const String paymentBox = 'paymentBox';
 }

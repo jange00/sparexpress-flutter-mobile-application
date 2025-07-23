@@ -1,9 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_event.dart';
-import 'package:sparexpress/features/home/presentation/view_model/product_view_model/product_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_event.dart';
+import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
 import 'package:sparexpress/features/home/domin/use_case/get_all_product_usecase.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:dartz/dartz.dart';

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:sparexpress/app/constant/api_endpoints.dart';
+import 'package:sparexpress/app/shared_pref/token_shared_prefs.dart';
 import 'package:sparexpress/core/network/api_service.dart';
 import 'package:sparexpress/features/auth/data/data_source/customer_data_source.dart';
 import 'package:sparexpress/features/auth/data/model/customer_api_model.dart';
@@ -7,8 +8,9 @@ import 'package:sparexpress/features/auth/domain/entity/customer_entity.dart';
 
 class CustomerRemoteDatasource implements ICustomerDataSource{
   final ApiService _apiService;
+  final TokenSharedPrefs tokenSharedPrefs;
 
-  CustomerRemoteDatasource({required ApiService apiservice}) : _apiService = apiservice;
+  CustomerRemoteDatasource({required ApiService apiservice,required this.tokenSharedPrefs}) : _apiService = apiservice;
 
   @override
    Future<void> registerCustomer(CustomerEntity customerData) async {
@@ -41,6 +43,12 @@ class CustomerRemoteDatasource implements ICustomerDataSource{
         "password": password,
       });
       print(response.data['token']);
+     await tokenSharedPrefs.saveToken(response.data['token']);
+      final tokenResult = await tokenSharedPrefs.getToken();
+tokenResult.fold(
+  (failure) => print("Failed to get token: ${failure.message}"),
+  (token) => print("Saved token: $token"),
+);
 
       if (response.statusCode == 200) {
         return response.data['token'];
@@ -78,17 +86,37 @@ class CustomerRemoteDatasource implements ICustomerDataSource{
   }
   @override
   Future<CustomerEntity> getCurrentUser() async {
+    final tokenResult = await tokenSharedPrefs.getToken();
+    String? token;
+    tokenResult.fold(
+      (failure) => token = null,
+      (savedToken) => token = savedToken,
+    );
+    print('Token used for getCurrentUser: $token');
     try {
-      final response = await _apiService.dio.get(ApiEndpoints.getMe);
+      final response = await _apiService.dio.get(
+        ApiEndpoints.getMe,
+        options: Options(
+          headers: {
+            'authorization': token != null ? 'Bearer $token' : '',
+          },
+        ),
+      );
+      print('getCurrentUser response status: ${response.statusCode}');
+      print('getCurrentUser response data: ${response.data}');
 
       if (response.statusCode == 200) {
-        return AuthApiModel.fromJson(response.data).toEntity();
+        final user = AuthApiModel.fromJson(response.data['data']).toEntity();
+        print('Parsed user entity: ' + user.toString());
+        return user;
       } else {
-        throw Exception("Failed to fetch current user: ${response.statusCode} ${response.statusMessage}");
+        throw Exception("Failed to fetch current user: ${response.statusCode} ${response.statusMessage} ${response.data}");
       }
     } on DioException catch (e) {
+      print('DioException in getCurrentUser: ${e.response?.data ?? e.message}');
       throw Exception('Failed to fetch current user: ${e.response?.data ?? e.message}');
     } catch (e) {
+      print('Unexpected error in getCurrentUser: $e');
       throw Exception('An unexpected error occurred: $e');
     }
   }

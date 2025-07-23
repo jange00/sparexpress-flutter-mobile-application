@@ -20,6 +20,16 @@ class ProductRemoteRepository implements IProductRepository {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, ProductEntity>> getProductById(String id) async {
+    try {
+      final product = await _productRemoteDataSource.getProductById(id);
+      return Right(product);
+    } catch (e) {
+      return Left(RemoteDatabaseFailure(message: e.toString()));
+    }
+  }
   
   @override
   Future<Either<Failure, void>> createProduct(ProductEntity product) {

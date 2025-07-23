@@ -39,4 +39,14 @@ class ProductLocalRepository implements IProductRepository {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, ProductEntity>> getProductById(String id) async {
+    try {
+      final product = await _productLocalDataSource.getProductById(id);
+      return Right(product);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
 }

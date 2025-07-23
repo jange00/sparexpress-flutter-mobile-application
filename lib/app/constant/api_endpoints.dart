@@ -15,6 +15,7 @@ class ApiEndpoints {
   static const String register = "auth/register";
   static const String uploadImage = "auth/uploadImage";
   static const String getMe="auth/getMe";
+  // static const String getMe="admin/users/getMe";
   
   // Users 
   static const String createUser = "admin/create";
@@ -30,4 +31,27 @@ class ApiEndpoints {
   // Category
   static const String getAllCategory = "admin/categories";
   static const String getAllCategoryById = "admin/categories/:id";
+
+  // Cart
+ static const String createCart = "cart/";
+ static const String getCartByUser = "cart/user"; 
+//  static const String deleteCart = "cart/item/:cartItemId";
+ static const String deleteCart = "cart/item/:cartItemId"; 
+ static const String clearCartByUser = "cart/clear/:userId";
+
+  // Shipping address
+  static const String getShippingAddressesByUserId = "shipping-address/users/:userId";
+  static const String createShippingAddress = "shipping-address/";
+  static const String deleteShippingAddress = "shipping-address/:id";
+
+  // Order
+  static const String getOrderByUserId = "orders/users/:userId";
+  static const String createOrder = "/orders/";
+  static const String deleteOrder = "orders/:id";
+
+  // Payments
+  static const String getPaymentByUserId = "payments/users/:userId";
+  static const String createPayment = "payments/";
+  static const String deletePayment = "payments/:id";
+
 }

@@ -11,6 +11,9 @@ import 'package:sparexpress/features/auth/presentation/view_model/login_view_mod
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view/home_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_view_model.dart';
+import 'package:sparexpress/app/constant/theme_constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sparexpress/features/auth/domain/use_case/customer_get_current_usecase.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState>{
   final CustomerLoginUseCase _customerLoginUseCase;
@@ -75,25 +78,67 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState>{
         // Handle failure case
         emit(state.copyWith(isLoading: false, isSuccess: false));
 
-        showMySnackBar(
-          context: event.context,
+        showAppSnackBar(
+          event.context,
           message: 'Invalid credentials. Please try again.',
-          color: Colors.red,
+          icon: Icons.error_outline,
+          backgroundColor: Colors.red[700],
         );
       },
-      (token) {
+      (token) async {
         // Handle success case
         emit(state.copyWith(isLoading: false, isSuccess: true));
-              Navigator.pushReplacement(
-        event.context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: serviceLocator<HomeViewModel>(),
-            child: const HomeView(),
+        // Fetch user profile and save userId
+        final getCurrentUser = serviceLocator<CustomerGetCurrentUseCase>();
+        final userResult = await getCurrentUser();
+        bool userIdSaved = false;
+        await userResult.fold(
+          (failure) async {
+            showAppSnackBar(
+              event.context,
+              message: 'Failed to fetch user profile. Please try again.',
+              icon: Icons.error_outline,
+              backgroundColor: Colors.red[700],
+            );
+          },
+          (user) async {
+            final prefs = serviceLocator<SharedPreferences>();
+            if (user.customerId != null && user.customerId!.isNotEmpty) {
+              await prefs.setString('userId', user.customerId!);
+              print('Saved userId: \'${user.customerId}\' to SharedPreferences');
+              userIdSaved = true;
+            } else {
+              showAppSnackBar(
+                event.context,
+                message: 'User ID missing in profile. Please contact support.',
+                icon: Icons.error_outline,
+                backgroundColor: Colors.red[700],
+              );
+            }
+          },
+        );
+        if (!userIdSaved) {
+          emit(state.copyWith(isLoading: false, isSuccess: false));
+          return;
+        }
+        Navigator.pushReplacement(
+          event.context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider.value(
+              value: serviceLocator<HomeViewModel>(),
+              child: const HomeView(),
+            ),
           ),
-        ),
-      );
-        // add(NavigateToHomeViewEvent(context: event.context));
+        );
+        // Show success toast after navigation
+        Future.delayed(const Duration(milliseconds: 300), () {
+          showAppSnackBar(
+            event.context,
+            message: 'Login successful!',
+            icon: Icons.check_circle,
+            backgroundColor: Colors.green[700],
+          );
+        });
       },
     );
   }
