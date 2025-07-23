@@ -12,6 +12,7 @@ import 'package:sparexpress/features/home/presentation/widgets/shipping_address/
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/shipping_address/shipping_address_form_page.dart';
 
 
 class CheckoutSection extends StatelessWidget {
@@ -136,7 +137,15 @@ class CheckoutSection extends StatelessWidget {
                                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                         ),
                                                         onPressed: () {
-                                                          Navigator.pushNamed(sheetContext, '/add-shipping-address');
+                                                          Navigator.push(
+                                                            sheetContext,
+                                                            MaterialPageRoute(
+                                                              builder: (_) => BlocProvider(
+                                                                create: (_) => serviceLocator<ShippingAddressBloc>(),
+                                                                child: ShippingAddressFormPage(userId: userId),
+                                                              ),
+                                                            ),
+                                                          );
                                                         },
                                                         label: const Text('Add New Address', style: TextStyle(fontSize: 16)),
                                                       ),
@@ -164,7 +173,15 @@ class CheckoutSection extends StatelessWidget {
                                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                       ),
                                                       onPressed: () {
-                                                        Navigator.pushNamed(sheetContext, '/add-shipping-address');
+                                                        Navigator.push(
+                                                          sheetContext,
+                                                          MaterialPageRoute(
+                                                            builder: (_) => BlocProvider(
+                                                              create: (_) => serviceLocator<ShippingAddressBloc>(),
+                                                              child: ShippingAddressFormPage(userId: userId),
+                                                            ),
+                                                          ),
+                                                        );
                                                       },
                                                       label: const Text('Add New Address', style: TextStyle(fontSize: 16)),
                                                     ),

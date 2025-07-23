@@ -20,6 +20,7 @@ import 'package:sparexpress/features/home/presentation/view_model/checkout/check
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
 import 'package:flutter/services.dart';
 import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
+import 'package:sparexpress/features/home/presentation/widgets/shipping_address/shipping_address_form_page.dart';
 
 
 class ProductDetailView extends StatelessWidget {
@@ -770,7 +771,15 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                                           ),
                                                                           onPressed: () {
-                                                                            Navigator.pushNamed(sheetContext, '/add-shipping-address');
+                                                                            Navigator.push(
+                                                                              sheetContext,
+                                                                              MaterialPageRoute(
+                                                                                builder: (_) => BlocProvider(
+                                                                                  create: (_) => serviceLocator<ShippingAddressBloc>(),
+                                                                                  child: ShippingAddressFormPage(userId: userId),
+                                                                                ),
+                                                                              ),
+                                                                            );
                                                                           },
                                                                           label: const Text('Add New Address', style: TextStyle(fontSize: 16)),
                                                                         ),
@@ -798,7 +807,15 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                                         ),
                                                                         onPressed: () {
-                                                                          Navigator.pushNamed(sheetContext, '/add-shipping-address');
+                                                                          Navigator.push(
+                                                                            sheetContext,
+                                                                            MaterialPageRoute(
+                                                                              builder: (_) => BlocProvider(
+                                                                                create: (_) => serviceLocator<ShippingAddressBloc>(),
+                                                                                child: ShippingAddressFormPage(userId: userId),
+                                                                              ),
+                                                                            ),
+                                                                          );
                                                                         },
                                                                         label: const Text('Add New Address', style: TextStyle(fontSize: 16)),
                                                                       ),

@@ -4,6 +4,8 @@ import 'package:sparexpress/features/home/presentation/view_model/shipping_addre
 import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/shipping_address/shipping_address_state.dart';
 import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
+import 'package:sparexpress/features/home/presentation/widgets/shipping_address/shipping_address_form_page.dart';
 
 class ShippingAddressListPage extends StatelessWidget {
   final String userId;
@@ -24,7 +26,15 @@ class ShippingAddressListPage extends StatelessWidget {
               return Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/add-shipping-address');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => serviceLocator<ShippingAddressBloc>(),
+                          child: ShippingAddressFormPage(userId: userId),
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Add Shipping Address'),
                 ),
@@ -39,7 +49,15 @@ class ShippingAddressListPage extends StatelessWidget {
                 )),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/add-shipping-address');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => serviceLocator<ShippingAddressBloc>(),
+                          child: ShippingAddressFormPage(userId: userId),
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Add New Address'),
                 ),

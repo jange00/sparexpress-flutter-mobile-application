@@ -43,8 +43,18 @@ class ShippingAddressRemoteDataSource implements IShippingAddressRemoteDataSourc
 
   @override
   Future<void> createShippingAddress(ShippingAddressEntity shipping) async {
+    final tokenResult = await tokenSharedPrefs.getToken();
+    String? token;
+    tokenResult.fold(
+      (failure) => print("Failed to get token: ${failure.message}"),
+      (savedToken) => token = savedToken,
+    );
     final body = ShippingAddressApiModel.fromEntity(shipping).toJson();
-    await _apiService.dio.post(ApiEndpoints.createShippingAddress, data: body);
+    await _apiService.dio.post(
+      ApiEndpoints.createShippingAddress,
+      data: body,
+      options: Options(headers: {'authorization': 'Bearer $token'}),
+    );
   }
 
   @override

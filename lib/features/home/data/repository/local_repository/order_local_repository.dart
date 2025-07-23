@@ -11,10 +11,10 @@ class OrderLocalRepository implements IOrderRepository {
       : _localDataSource = orderLocalDataSource;
 
   @override
-  Future<Either<Failure, void>> createOrder(OrderEntity order) async {
+  Future<Either<Failure, OrderEntity>> createOrder(OrderEntity order) async {
     try {
       await _localDataSource.createOrder(order);
-      return const Right(null);
+      return Right(order);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
@@ -34,7 +34,8 @@ class OrderLocalRepository implements IOrderRepository {
   Future<Either<Failure, List<OrderEntity>>> getOrdersByUserId(String userId) async {
     try {
       final result = await _localDataSource.getOrders();
-      return Right(result);
+      final filtered = result.where((order) => order.userId == userId).toList();
+      return Right(filtered);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }

@@ -111,14 +111,18 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   Future<void> _onRemoveCartItem(RemoveCartItem event, Emitter<CartState> emit) async {
     emit(CartLoading());
     final result = await deleteCartUsecase(event.productId);
-    result.fold(
-      (failure) => emit(CartError(failure.message)),
+    await result.fold(
+      (failure) async {
+        emit(CartError(failure.message));
+      },
       (_) async {
         // Reload cart after deletion
         final cartResult = await getAllCartUsecase();
-        cartResult.fold(
-          (failure) => emit(CartError(failure.message)),
-          (cartItems) {
+        await cartResult.fold(
+          (failure) async {
+            emit(CartError(failure.message));
+          },
+          (cartItems) async {
             final total = cartItems.fold<double>(
               0.0,
               (sum, item) => sum + (item.price * item.quantity),
@@ -133,13 +137,17 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   Future<void> _onUpdateCartItem(UpdateCartItem event, Emitter<CartState> emit) async {
     emit(CartLoading());
     final result = await updateCartItemUsecase(event.cartItemId, event.quantity);
-    result.fold(
-      (failure) => emit(CartError(failure.message)),
+    await result.fold(
+      (failure) async {
+        emit(CartError(failure.message));
+      },
       (_) async {
         final cartResult = await getAllCartUsecase();
-        cartResult.fold(
-          (failure) => emit(CartError(failure.message)),
-          (cartItems) {
+        await cartResult.fold(
+          (failure) async {
+            emit(CartError(failure.message));
+          },
+          (cartItems) async {
             final total = cartItems.fold<double>(
               0.0,
               (sum, item) => sum + (item.price * item.quantity),

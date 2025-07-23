@@ -34,13 +34,19 @@ class ShippingAddressBloc extends Bloc<ShippingAddressEvent, ShippingAddressStat
   Future<void> _onAddAddress(AddAddress event, Emitter emit) async {
     emit(ShippingAddressLoading());
     final result = await createShippingAddressUsecase(event.address);
-    result.fold(
-      (failure) => emit(ShippingAddressError(failure.message)),
+    await result.fold(
+      (failure) async {
+        emit(ShippingAddressError(failure.message));
+      },
       (_) async {
         final addressesResult = await getAllShippingAddressUsecase(event.address.userId);
-        addressesResult.fold(
-          (failure) => emit(ShippingAddressError(failure.message)),
-          (addresses) => emit(ShippingAddressLoaded(addresses)),
+        await addressesResult.fold(
+          (failure) async {
+            emit(ShippingAddressError(failure.message));
+          },
+          (addresses) async {
+            emit(ShippingAddressLoaded(addresses));
+          },
         );
       },
     );
@@ -53,14 +59,20 @@ class ShippingAddressBloc extends Bloc<ShippingAddressEvent, ShippingAddressStat
   Future<void> _onDeleteAddress(DeleteAddress event, Emitter emit) async {
     emit(ShippingAddressLoading());
     final result = await deleteShippingAddressUsecase(event.addressId);
-    result.fold(
-      (failure) => emit(ShippingAddressError(failure.message)),
+    await result.fold(
+      (failure) async {
+        emit(ShippingAddressError(failure.message));
+      },
       (_) async {
         // TODO: Pass the correct userId here. This may require storing the last used userId in the bloc state.
         final addressesResult = await getAllShippingAddressUsecase(''); // <-- Fix this by passing the correct userId
-        addressesResult.fold(
-          (failure) => emit(ShippingAddressError(failure.message)),
-          (addresses) => emit(ShippingAddressLoaded(addresses)),
+        await addressesResult.fold(
+          (failure) async {
+            emit(ShippingAddressError(failure.message));
+          },
+          (addresses) async {
+            emit(ShippingAddressLoaded(addresses));
+          },
         );
       },
     );
