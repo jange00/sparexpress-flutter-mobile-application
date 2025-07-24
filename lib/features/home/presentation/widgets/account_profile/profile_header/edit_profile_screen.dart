@@ -8,6 +8,7 @@ class EditProfileScreen extends StatefulWidget {
   final String name;
   final String email;
   final String phoneNumber;
+  final String? profileImageUrl;
 
   const EditProfileScreen({
     super.key,
@@ -15,6 +16,7 @@ class EditProfileScreen extends StatefulWidget {
     required this.name,
     required this.email,
     required this.phoneNumber,
+    this.profileImageUrl,
   });
 
   @override
@@ -125,17 +127,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   backgroundColor: Colors.grey[200],
                   backgroundImage: _pickedImageFile != null
                       ? FileImage(_pickedImageFile!)
-                      : (widget.name.isNotEmpty
-                          ? null
-                          : const AssetImage("assets/images/default_avatar.png")
-                              as ImageProvider),
-                  child: _pickedImageFile == null && widget.name.isNotEmpty
-                      ? null
-                      : const Icon(
+                      : (widget.profileImageUrl != null && widget.profileImageUrl!.isNotEmpty
+                          ? NetworkImage(widget.profileImageUrl!)
+                          : const AssetImage("assets/images/default_avatar.png") as ImageProvider),
+                  child: _pickedImageFile == null && (widget.profileImageUrl == null || widget.profileImageUrl!.isEmpty)
+                      ? const Icon(
                           Icons.person,
                           size: 60,
                           color: Colors.grey,
-                        ),
+                        )
+                      : null,
                 ),
                 Positioned(
                   bottom: -4,

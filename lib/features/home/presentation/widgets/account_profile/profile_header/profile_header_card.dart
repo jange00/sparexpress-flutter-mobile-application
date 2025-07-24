@@ -129,6 +129,7 @@ class ProfileHeaderCard extends StatelessWidget {
                                   name: user.fullName,
                                   email: user.email,
                                   phoneNumber: user.phoneNumber,
+                                  profileImageUrl: imageUrl,
                                 ),
                               ),
                             ),
