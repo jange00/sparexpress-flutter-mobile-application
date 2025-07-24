@@ -9,6 +9,7 @@ import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'dart:ui';
+import 'package:flutter_paypal/flutter_paypal.dart';
 
 class CheckoutPage extends StatefulWidget {
   final String userId;
@@ -52,6 +53,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
       'label': 'Cash on Delivery',
       'icon': Icons.money,
       'color': Color(0xFF795548),
+    },
+    {
+      'key': 'paypal',
+      'label': 'PayPal',
+      'icon': null, // We'll use a logo image
+      'color': Color(0xFF003087),
+      'logoUrl': 'https://www.paypalobjects.com/webstatic/icon/pp258.png',
     },
   ];
 
@@ -371,7 +379,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                                       child: Column(
                                         children: [
-                                          Icon(method['icon'], color: method['color'], size: 32),
+                                          method['key'] == 'paypal' && method['logoUrl'] != null
+                                              ? Image.network(
+                                                  method['logoUrl'],
+                                                  width: 32,
+                                                  height: 32,
+                                                )
+                                              : Icon(method['icon'], color: method['color'], size: 32),
                                           const SizedBox(height: 6),
                                           Text(method['label'], style: TextStyle(fontWeight: FontWeight.w600, color: isSelected ? method['color'] : Colors.black87)),
                                         ],
@@ -413,6 +427,76 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ),
                             );
                             context.read<CheckoutBloc>().add(ConfirmOrder('cod'));
+                          } else if (_selectedPayment == 'paypal') {
+                            // PayPal payment integration using actual cartItems
+                            final cartItems = widget.cartItems;
+                            if (cartItems.isEmpty) return;
+                            // Example conversion rate: 1 USD = 132 NPR
+                            const nprToUsd = 132.0;
+                            final items = cartItems.map((item) => {
+                              "name": (item.name ?? '').toString(),
+                              "quantity": (item.quantity ?? 1).toString(),
+                              "price": ((item.price ?? 0.0) / nprToUsd).toStringAsFixed(2),
+                              "currency": "USD",
+                            }).toList();
+                            final subtotal = items.fold<double>(
+                              0.0,
+                              (sum, item) => sum + double.parse((item["price"] ?? '0.00').toString()) * int.parse((item["quantity"] ?? '1').toString()),
+                            );
+                            final subtotalStr = subtotal.toStringAsFixed(2);
+                            final title = cartItems.length == 1 ? cartItems[0].name ?? '' : 'Multiple Products';
+                            print('PayPal subtotalStr: $subtotalStr, items: $items');
+                            if (subtotal <= 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Cannot pay zero amount!')),
+                              );
+                              return;
+                            }
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => UsePaypal(
+                                  sandboxMode: true,
+                                  clientId: "AcnpbvL-nqay69eboBK-a2hcQLnkFTQZXbTF0f4UafVwhRYAXe11Z0B3PtFyWCTDH24INY6Cu2U0rhRC",
+                                  secretKey: "EGZXWncK71BKAfqH7ClPpldekK6kSKvO9yIk0Loz36CkdM7uLC_vuE5mjbGjRhJhBT5BeOYyBB-_p6WW",
+                                  returnURL: "https://samplesite.com/return",
+                                  cancelURL: "https://samplesite.com/cancel",
+                                  transactions: [
+                                    {
+                                      "amount": {
+                                        "total": subtotalStr,
+                                        "currency": "USD",
+                                        "details": {
+                                          "subtotal": subtotalStr,
+                                          "shipping": "0.00",
+                                          "shipping_discount": "0.00",
+                                        },
+                                      },
+                                      "description": "Payment for product: $title",
+                                      "item_list": {
+                                        "items": items,
+                                      },
+                                    },
+                                  ],
+                                  note: "Contact us for any questions on your order.",
+                                  onSuccess: (Map params) async {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('PayPal payment successful!')),
+                                    );
+                                    context.read<CheckoutBloc>().add(ConfirmOrder('paypal'));
+                                  },
+                                  onError: (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('PayPal payment error: $error')),
+                                    );
+                                  },
+                                  onCancel: (params) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('PayPal payment cancelled')),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
