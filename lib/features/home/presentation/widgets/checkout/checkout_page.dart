@@ -33,14 +33,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     {
       'key': 'esewa',
       'label': 'eSewa',
-      'icon': Icons.account_balance_wallet,
-      'color': Color(0xFF1EB564),
+      'icon': null,
+      'color': Color(0xFF1EB564), // eSewa green
+      'logoUrl': 'https://media.licdn.com/dms/image/sync/v2/D4D27AQG8vY0HJvndiA/articleshare-shrink_800/articleshare-shrink_800/0/1734856652596?e=2147483647&v=beta&t=Bv2nRIjUfQqm01SIrVrfe4kBIeZLA-FAAf4RgwbKpMg',
     },
     {
       'key': 'khalti',
       'label': 'Khalti',
-      'icon': Icons.account_balance,
+      'icon': null,
       'color': Color(0xFF5F259F),
+      'logoUrl': 'https://blog.khalti.com/wp-content/uploads/2021/01/khalti-icon.png',
     },
     {
       'key': 'bank',
@@ -50,7 +52,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     },
     {
       'key': 'cod',
-      'label': 'Cash on Delivery',
+      'label': 'COD',
       'icon': Icons.money,
       'color': Color(0xFF795548),
     },
@@ -379,11 +381,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                                       child: Column(
                                         children: [
-                                          method['key'] == 'paypal' && method['logoUrl'] != null
-                                              ? Image.network(
-                                                  method['logoUrl'],
-                                                  width: 32,
-                                                  height: 32,
+                                          method['logoUrl'] != null
+                                              ? Container(
+                                                  width: 40,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: method['key'] == 'esewa' ? method['color'] : Colors.transparent,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(4.0),
+                                                    child: ClipOval(
+                                                      child: Image.network(
+                                                        method['logoUrl'],
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                  ),
                                                 )
                                               : Icon(method['icon'], color: method['color'], size: 32),
                                           const SizedBox(height: 6),
