@@ -1,14 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/profile_header/update_user_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
+  final String userId;
   final String name;
   final String email;
   final String phoneNumber;
 
   const EditProfileScreen({
     super.key,
+    required this.userId,
     required this.name,
     required this.email,
     required this.phoneNumber,
@@ -27,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   File? _pickedImageFile;
   final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -63,14 +67,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     Navigator.of(context).pop();
   }
 
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.of(context).pop({
-        "name": _nameController.text.trim(),
-        "email": _emailController.text.trim(),
-        "phone": _phoneController.text.trim(),
-        "imageFile": _pickedImageFile,
-      });
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+    try {
+      final updatedUser = await updateUserProfile(
+        userId: widget.userId,
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        imageFile: _pickedImageFile,
+      );
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully!')),
+      );
+      Navigator.of(context).pop(updatedUser);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $e')),
+      );
     }
   }
 
@@ -221,8 +239,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: _saveProfile,
-                    child: const Text('Save'),
+                    onPressed: _isLoading ? null : _saveProfile,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(strokeWidth: 3),
+                          )
+                        : const Text('Save'),
                   ),
                 ),
               ],

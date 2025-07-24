@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_state.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
 import 'edit_profile_screen.dart';
 
 class ProfileHeaderCard extends StatelessWidget {
@@ -94,7 +95,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 const SizedBox(height: 24),
                 GestureDetector(
                   onTap: () async {
-                    final result = await showGeneralDialog<Map<String, String>>(
+                    final result = await showGeneralDialog<Map<String, dynamic>>( // Accept any updated user map
                       context: context,
                       barrierLabel: "Edit Profile",
                       barrierDismissible: true,
@@ -124,9 +125,10 @@ class ProfileHeaderCard extends StatelessWidget {
                                   ],
                                 ),
                                 child: EditProfileScreen(
-                                  name: name,
-                                  email: email,
-                                  phoneNumber: phoneNumber,
+                                  userId: user.customerId ?? '',
+                                  name: user.fullName,
+                                  email: user.email,
+                                  phoneNumber: user.phoneNumber,
                                 ),
                               ),
                             ),
@@ -145,9 +147,11 @@ class ProfileHeaderCard extends StatelessWidget {
                     );
 
                     if (result != null) {
-                      // TODO: Handle the updated data (e.g., update parent widget or state)
-                      // Example: print result
-                      print("Updated profile data: $result");
+                      // Option 1: Update the UI with the new info directly
+                      // setState is not available in StatelessWidget, so you may want to use a BLoC or Provider event
+                      // Option 2: Reload the profile from the backend
+                      // Here, we trigger a reload event for the ProfileBloc
+                      context.read<ProfileBloc>().add(FetchCustomerProfile());
                     }
                   },
                   child: Container(
