@@ -21,6 +21,10 @@ import 'package:sparexpress/features/home/presentation/view_model/account/paymen
 import 'package:sparexpress/features/home/presentation/view_model/account/payment_view_model/payment_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/payment_view_model/payment_state.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/payment/payment_overlay.dart';
+import 'package:sparexpress/features/auth/domain/use_case/delete_user_usecase.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/delete_account/delete_account_card.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/account_view_model/account_event.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountView extends StatelessWidget {
   const AccountView({super.key});
@@ -47,6 +51,17 @@ class AccountView extends StatelessWidget {
               ),
             ),
             (route) => false,
+          );
+        }
+        if (state is AccountDeleteSuccess) {
+          Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Account deleted successfully!')),
+          );
+        }
+        if (state is AccountDeleteFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${state.message}')),
           );
         }
       },
@@ -126,11 +141,67 @@ class AccountView extends StatelessWidget {
                 const AboutUsCard(),
                 const SizedBox(height: 16),
                 LogoutCard(blocContext: context),
+                const SizedBox(height: 16),
+                DeleteAccountCard(
+                  onDelete: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    final userId = prefs.getString('userId');
+                    if (userId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('User ID not found. Please log in again.')),
+                      );
+                      return;
+                    }
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Delete Account'),
+                        content: const Text('Are you sure you want to delete your account? This action cannot be undone.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Yes, Delete', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      BlocProvider.of<AccountBloc>(context).add(DeleteAccountRequested(userId));
+                    }
+                  },
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+Future<void> _deleteAccount(BuildContext context) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User ID not found. Please log in again.')),
+      );
+      return;
+    }
+    final deleteUserUsecase = serviceLocator<DeleteUserUsecase>();
+    await deleteUserUsecase(userId);
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Account deleted successfully!')),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
     );
   }
 }

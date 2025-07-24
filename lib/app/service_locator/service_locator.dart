@@ -59,6 +59,10 @@ import 'package:sparexpress/features/home/data/data_source/remote_datasource/pay
 import 'package:sparexpress/features/home/data/repository/remote_repository/payment_remote_repository.dart';
 import 'package:sparexpress/features/home/domin/use_case/payment/get_all_payment_usecase.dart';
 import 'package:sparexpress/features/home/domin/use_case/order/delete_order_usecase.dart';
+import 'package:sparexpress/features/auth/data/data_source/remote_datasource/user_remote_datasource.dart';
+import 'package:sparexpress/features/auth/data/repository/remote_repository/user_remote_repository.dart';
+import 'package:sparexpress/features/auth/domain/repository/user_repository.dart';
+import 'package:sparexpress/features/auth/domain/use_case/delete_user_usecase.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -159,6 +163,15 @@ Future <void> _initAuthModule() async {
   serviceLocator.registerFactory(() => ProfileBloc(
   getCurrentCustomer: serviceLocator<CustomerGetCurrentUseCase>(),
 ));
+  serviceLocator.registerFactory<UserRemoteDatasource>(
+    () => UserRemoteDatasource(apiService: serviceLocator<ApiService>()),
+  );
+  serviceLocator.registerFactory<IUserRepository>(
+    () => UserRemoteRepository(remoteDatasource: serviceLocator<UserRemoteDatasource>()),
+  );
+  serviceLocator.registerFactory<DeleteUserUsecase>(
+    () => DeleteUserUsecase(repository: serviceLocator<IUserRepository>()),
+  );
 }
 
 // Home

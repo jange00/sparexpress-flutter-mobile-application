@@ -6,6 +6,7 @@ import 'account_event.dart';
 import 'account_state.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/app/shared_pref/token_shared_prefs.dart';
+import 'package:sparexpress/features/auth/domain/use_case/delete_user_usecase.dart';
 
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final BuildContext context;
@@ -15,6 +16,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   AccountBloc({required this.context}) : super(AccountInitial()) {
     on<LogoutRequested>(_onLogoutRequested);
     on<ShakeDetected>(_onShakeDetected);
+    on<DeleteAccountRequested>(_onDeleteAccountRequested);
     _startListening();
   }
 
@@ -44,6 +46,16 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
   void _onShakeDetected(ShakeDetected event, Emitter<AccountState> emit) {
     add(LogoutRequested());
+  }
+
+  Future<void> _onDeleteAccountRequested(DeleteAccountRequested event, Emitter<AccountState> emit) async {
+    try {
+      final deleteUserUsecase = serviceLocator<DeleteUserUsecase>();
+      await deleteUserUsecase(event.userId);
+      emit(AccountDeleteSuccess());
+    } catch (e) {
+      emit(AccountDeleteFailure(e.toString()));
+    }
   }
 
   @override
