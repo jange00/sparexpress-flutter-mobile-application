@@ -4,6 +4,7 @@ import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/core/network/hive_service.dart';
 import 'package:provider/provider.dart';
 import 'package:sparexpress/features/home/presentation/widgets/account_profile/logout/proximity_provider.dart';
+import 'package:sparexpress/core/common/internet_checker/global_connectivity_banner.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +14,17 @@ void main() async{
   runApp(
     ChangeNotifierProvider(
       create: (_) => ShakeLogoutProvider(),
-      child: App(),
+      child: AppWithBanner(),
     ),
   );
+}
+
+// Add this widget to wrap MaterialApp with the banner using the builder property
+class AppWithBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return App(
+      builder: (context, child) => GlobalConnectivityBanner(child: child!),
+    );
+  }
 }
