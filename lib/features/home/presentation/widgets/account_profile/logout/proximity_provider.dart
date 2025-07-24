@@ -32,7 +32,7 @@ class ShakeLogoutProvider extends ChangeNotifier {
   }
 
   // Shake detection logic
-  static const double shakeThreshold = 10.0;
+  static const double shakeThreshold = 5.0;
   int _lastShakeTimestamp = 0;
 
   void _onAccelerometerEvent(AccelerometerEvent event) {
