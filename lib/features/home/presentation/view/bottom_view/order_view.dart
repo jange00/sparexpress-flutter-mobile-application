@@ -7,6 +7,10 @@ import 'package:sparexpress/features/home/domin/use_case/product/get_product_by_
 import 'package:sparexpress/features/home/presentation/view_model/order/order_view_model/order_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/order/order_view_model/order_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/order/order_view_model/order_state.dart';
+import 'package:sparexpress/features/home/domin/use_case/shipping/get_all_shipping_addresses_usecase.dart';
+import 'package:sparexpress/features/home/domin/entity/shipping_entity.dart';
+import 'package:sparexpress/app/constant/theme_constant.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 
 class OrderView extends StatelessWidget {
   final String userId;
@@ -34,184 +38,94 @@ class OrderView extends StatelessWidget {
                 itemCount: state.orders.length,
                 itemBuilder: (context, index) {
                   final order = state.orders[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Order Header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Order #${order.orderId?.substring(order.orderId!.length - 8) ?? 'N/A'}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Chip(
-                                label: Text(order.orderStatus),
-                                backgroundColor: _getStatusColor(order.orderStatus)[0],
-                                labelStyle: TextStyle(
-                                  color: _getStatusColor(order.orderStatus)[1],
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-
-                          // Total Amount and Image
-                          Row(
+                  return FutureBuilder<ShippingAddressEntity?>(
+                    future: _getShippingAddress(context, order.shippingAddressId),
+                    builder: (context, addressSnapshot) {
+                      final address = addressSnapshot.data;
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              // Order Header
+                              Row(
+                                children: [
+                                  Text(
+                                    'Order #${order.orderId?.substring(order.orderId!.length - 8) ?? 'N/A'}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  _StatusChip(order.orderStatus),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              if (order.amount != null)
+                                Text(
+                                  'Total: Rs. ${_formatAmount(order.amount!)}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              const SizedBox(height: 10),
+                              Divider(color: Colors.grey[300]),
+                              // Shipping Address
+                              const Text('Shipping Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ThemeConstant.primaryColor)),
+                              const SizedBox(height: 4),
+                              if (address != null)
+                                Text(
+                                  '${address.streetAddress}, ${address.city}, ${address.province}, ${address.country}\nPostal: ${address.postalCode}',
+                                  style: const TextStyle(fontSize: 14),
+                                )
+                              else
+                                Text(order.shippingAddressId, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                              const SizedBox(height: 10),
+                              Divider(color: Colors.grey[300]),
+                              // Products List
+                              const Text('Products', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: ThemeConstant.primaryColor)),
+                              const SizedBox(height: 6),
+                              ...order.items.map((item) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Row(
                                   children: [
-                                    // Total Amount
-                                    Text(
-                                      'Total Amount: Rs. ${_getOrderTotal(order)}',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        item.productName ?? 'Product #${item.productId}',
+                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(height: 16),
-
-                                    // Shipping Address ID
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[100],
-                                        borderRadius: BorderRadius.circular(8),
+                                    Expanded(
+                                      child: Text(
+                                        'Qty: ${item.quantity}',
+                                        style: const TextStyle(fontSize: 13),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Shipping Address ID',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            order.shippingAddressId,
-                                            style: const TextStyle(fontSize: 13),
-                                          ),
-                                        ],
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        item.productPrice != null ? 'Rs. ${_formatAmount(item.productPrice!)}' : '',
+                                        style: const TextStyle(fontSize: 13, color: Colors.deepOrange),
+                                        textAlign: TextAlign.right,
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              if (order.items.isNotEmpty)
-                                FutureBuilder<ProductEntity?>(
-                                  future: _getProductDetails(order.items.first.productId),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return Container(
-                                        width: 120,
-                                        height: 120,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: Colors.grey[300]!),
-                                        ),
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      );
-                                    }
-                                    
-                                    if (snapshot.hasData && snapshot.data?.image != null) {
-                                      final imageUrl = snapshot.data!.image.isNotEmpty 
-                                          ? snapshot.data!.image[0] 
-                                          : null;
-                                      
-                                      return Container(
-                                        width: 120,
-                                        height: 120,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: Colors.grey[300]!),
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: imageUrl != null
-                                              ? Image.network(
-                                                  'http://192.168.1.71:5000/uploads/$imageUrl',
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) {
-                                                    print('Image error: $error');
-                                                    return _buildImageError();
-                                                  },
-                                                )
-                                              : _buildImageError(),
-                                        ),
-                                      );
-                                    }
-                                    
-                                    return _buildImageError();
-                                  },
-                                ),
+                              )),
                             ],
                           ),
-                          const SizedBox(height: 16),
-
-                          // Products List
-                          const Text(
-                            'Products',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          ...order.items.map((item) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.productName ?? 'Product #${item.productId}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    'Qty: ${item.quantity}',
-                                    style: const TextStyle(fontSize: 13),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               );
@@ -238,33 +152,16 @@ class OrderView extends StatelessWidget {
     );
   }
 
-  Widget _buildImageError() {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-        color: Colors.grey[100],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.image_not_supported_outlined,
-            color: Colors.grey[400],
-            size: 32,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Image not found',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
+  // Helper to fetch full shipping address
+  Future<ShippingAddressEntity?> _getShippingAddress(BuildContext context, String addressId) async {
+    final usecase = serviceLocator<GetAllShippingAddressUsecase>();
+    final addressesResult = await usecase(userId);
+    return addressesResult.fold(
+      (failure) => null,
+      (addresses) {
+        final found = addresses.where((a) => a.id == addressId).cast<ShippingAddressEntity>();
+        return found.isNotEmpty ? found.first : null;
+      },
     );
   }
 
@@ -282,29 +179,70 @@ class OrderView extends StatelessWidget {
     }
   }
 
-
-
-  List<Color> _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'delivered':
-        return [Colors.green[50]!, Colors.green[800]!];
-      case 'shipped':
-        return [Colors.blue[50]!, Colors.blue[800]!];
-      case 'processing':
-        return [Colors.orange[50]!, Colors.orange[800]!];
-      case 'cancelled':
-        return [Colors.red[50]!, Colors.red[800]!];
-      default:
-        return [Colors.grey[50]!, Colors.grey[800]!];
-    }
+  String _formatAmount(double amount) {
+    return amount.toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ',');
   }
 
-  String _getOrderTotal(OrderEntity order) {
-    if (order.amount != null) {
-      return order.amount!.toStringAsFixed(2);
+  Widget _buildImageErrorThumb() {
+    return Container(
+      width: 60,
+      height: 60,
+      color: Colors.grey[200],
+      child: const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 28),
+    );
+  }
+}
+
+// Status chip widget
+class _StatusChip extends StatelessWidget {
+  final String status;
+  const _StatusChip(this.status);
+  @override
+  Widget build(BuildContext context) {
+    final lower = status.toLowerCase();
+    Color bg;
+    Color fg;
+    IconData icon;
+    switch (lower) {
+      case 'delivered':
+        bg = Colors.green[50]!;
+        fg = Colors.green[800]!;
+        icon = Icons.check_circle_outline;
+        break;
+      case 'shipped':
+        bg = ThemeConstant.primaryColor.withOpacity(0.15);
+        fg = ThemeConstant.primaryColor;
+        icon = Icons.local_shipping_outlined;
+        break;
+      case 'processing':
+        bg = Colors.orange[50]!;
+        fg = Colors.orange[800]!;
+        icon = Icons.hourglass_top_rounded;
+        break;
+      case 'cancelled':
+        bg = Colors.red[50]!;
+        fg = Colors.red[800]!;
+        icon = Icons.cancel_outlined;
+        break;
+      default:
+        bg = Colors.grey[100]!;
+        fg = Colors.grey[800]!;
+        icon = Icons.info_outline;
     }
-    // Calculate total from items if order amount is not available
-    final total = order.items.fold(0.0, (sum, item) => sum + item.total);
-    return total.toStringAsFixed(2);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: fg, size: 16),
+          const SizedBox(width: 4),
+          Text(status, style: TextStyle(color: fg, fontWeight: FontWeight.bold, fontSize: 13)),
+        ],
+      ),
+    );
   }
 }
