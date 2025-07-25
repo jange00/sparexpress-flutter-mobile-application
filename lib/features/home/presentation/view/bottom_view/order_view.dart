@@ -96,11 +96,15 @@ class _OrderViewState extends State<OrderView> {
                               children: [
                                 const Icon(Icons.receipt_long, color: ThemeConstant.primaryColor, size: 22),
                                 const SizedBox(width: 8),
-                                Text(
-                                  'Order #${order.orderId?.substring(order.orderId!.length - 8) ?? 'N/A'}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                Expanded(
+                                  child: Text(
+                                    'Order #${order.orderId?.substring(order.orderId!.length - 8) ?? 'N/A'}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                 ),
                                 IconButton(
@@ -116,7 +120,6 @@ class _OrderViewState extends State<OrderView> {
                                     }
                                   },
                                 ),
-                                const Spacer(),
                                 _StatusChip(order.orderStatus),
                               ],
                             ),
