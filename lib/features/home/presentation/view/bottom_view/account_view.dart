@@ -102,8 +102,8 @@ class AccountView extends StatelessWidget {
                 const SizedBox(height: 24),
                 // Theme toggle card
                 ThemeToggleCard(
-                  isDarkMode: isDark,
-                  onChanged: (val) => themeNotifier.toggleDark(val),
+                  themeMode: themeNotifier.themeMode,
+                  onChanged: (mode) => themeNotifier.setThemeMode(mode),
                 ),
                 const SizedBox(height: 16),
                 ChangePasswordCard(
