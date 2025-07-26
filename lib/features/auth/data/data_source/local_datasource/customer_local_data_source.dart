@@ -45,7 +45,19 @@ class CustomerLocalDataSource implements ICustomerDataSource {
 
   @override
   Future<CustomerEntity> getCurrentUser() async {
-    // TODO: implement uploadProfilePicture
+    // TODO: implement getCurrentUser
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    // TODO: implement requestPasswordReset
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> resetPassword(String token, String newPassword) async {
+    // TODO: implement resetPassword
     throw UnimplementedError();
   }
 }

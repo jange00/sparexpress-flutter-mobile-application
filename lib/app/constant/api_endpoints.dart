@@ -18,6 +18,8 @@ class ApiEndpoints {
   static const String uploadImage = "auth/uploadImage";
   static const String getMe="auth/getMe";
   static const String changePassword = "auth/change-password";
+  static const String requestResetPassword = "auth/request-reset";
+  static const String resetPassword = "auth/reset-password";
   // static const String getMe="admin/users/getMe";
   
   // Users 

@@ -120,4 +120,44 @@ tokenResult.fold(
       throw Exception('An unexpected error occurred: $e');
     }
   }
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    try {
+      final response = await _apiService.dio.post(
+        ApiEndpoints.requestResetPassword,
+        data: {'email': email},
+      );
+
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw Exception("Failed to request password reset: ${response.statusCode} ${response.statusMessage}");
+      }
+    } on DioException catch (e) {
+      throw Exception('Failed to request password reset: ${e.response?.data ?? e.message}');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> resetPassword(String token, String newPassword) async {
+    try {
+      final response = await _apiService.dio.post(
+        ApiEndpoints.resetPassword.replaceFirst(':token', token),
+        data: {'password': newPassword},
+      );
+
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw Exception("Failed to reset password: ${response.statusCode} ${response.statusMessage}");
+      }
+    } on DioException catch (e) {
+      throw Exception('Failed to reset password: ${e.response?.data ?? e.message}');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
 }

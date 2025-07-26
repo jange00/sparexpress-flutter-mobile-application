@@ -12,6 +12,8 @@ import 'package:sparexpress/features/auth/domain/use_case/customer_get_current_u
 import 'package:sparexpress/features/auth/domain/use_case/customer_image_upload_usecase.dart';
 import 'package:sparexpress/features/auth/domain/use_case/customer_login_usecase.dart';
 import 'package:sparexpress/features/auth/domain/use_case/customer_register_usecase.dart';
+import 'package:sparexpress/features/auth/domain/use_case/customer_request_reset_usecase.dart';
+import 'package:sparexpress/features/auth/domain/use_case/customer_reset_password_usecase.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/cart_remote_data_source.dart';
@@ -132,6 +134,18 @@ Future <void> _initAuthModule() async {
 
   serviceLocator.registerLazySingleton<CustomerRegisterUseCase>(
     () => CustomerRegisterUseCase(
+      customerRepository: serviceLocator<CustomerRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<CustomerRequestResetUseCase>(
+    () => CustomerRequestResetUseCase(
+      customerRepository: serviceLocator<CustomerRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<CustomerResetPasswordUseCase>(
+    () => CustomerResetPasswordUseCase(
       customerRepository: serviceLocator<CustomerRemoteRepository>(),
     ),
   );

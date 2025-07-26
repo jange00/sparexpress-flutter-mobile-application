@@ -50,4 +50,24 @@ class CustomerLocalRepository implements ICustomerRepository {
     // TODO: implement uploadProfilePicture
     throw UnimplementedError();
   }
+
+  @override
+  Future<Either<Failure, void>> requestPasswordReset(String email) async {
+    try {
+      await _customerLocalDataSource.requestPasswordReset(email);
+      return const Right(null);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: "Failed to request password reset: $e"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> resetPassword(String token, String newPassword) async {
+    try {
+      await _customerLocalDataSource.resetPassword(token, newPassword);
+      return const Right(null);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: "Failed to reset password: $e"));
+    }
+  }
 }
