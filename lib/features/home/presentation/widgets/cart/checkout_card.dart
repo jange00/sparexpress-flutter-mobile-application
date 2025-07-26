@@ -229,7 +229,42 @@ class CheckoutSection extends StatelessWidget {
                                               },
                                             );
                                           } else if (state is ShippingAddressError) {
-                                            return Center(child: Text(state.message));
+                                            // Show dialog asking user to add shipping address first
+                                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                                              showDialog(
+                                                context: sheetContext,
+                                                barrierDismissible: false,
+                                                builder: (context) => AlertDialog(
+                                                  title: const Text('Shipping Address Required'),
+                                                  content: const Text('Please add a shipping address before proceeding with checkout.'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close dialog
+                                                        Navigator.of(sheetContext).pop(); // Close bottom sheet
+                                                      },
+                                                      child: const Text('Cancel'),
+                                                    ),
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close dialog
+                                                        Navigator.push(
+                                                          sheetContext,
+                                                          MaterialPageRoute(
+                                                            builder: (_) => BlocProvider(
+                                                              create: (_) => serviceLocator<ShippingAddressBloc>(),
+                                                              child: ShippingAddressFormPage(userId: userId),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: const Text('Add Address'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            });
+                                            return const SizedBox.shrink(); // Return empty widget since dialog will show
                                           }
                                           return const SizedBox.shrink();
                                         },
