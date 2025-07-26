@@ -64,23 +64,52 @@ tokenResult.fold(
 
   @override
   Future<String> uploadProfilePicture(String filePath) async {
-    print(filePath);
+    print('Uploading image from path: $filePath');
+    
+    final tokenResult = await tokenSharedPrefs.getToken();
+    String? token;
+    tokenResult.fold(
+      (failure) => token = null,
+      (savedToken) => token = savedToken,
+    );
+    
+    print('Token for upload: $token');
+    
     try {
       final formData = FormData.fromMap({
         'profilePicture': await MultipartFile.fromFile(filePath),
       });
 
-      final response = await _apiService.dio.post(ApiEndpoints.uploadImage, data: formData);
+      final response = await _apiService.dio.post(
+        ApiEndpoints.uploadImage, 
+        data: formData,
+        options: Options(
+          headers: {
+            'authorization': token != null ? 'Bearer $token' : '',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
 
-      if (response.statusCode == 200) {
+      print('Upload response status: ${response.statusCode}');
+      print('Upload response data: ${response.data}');
 
-        return response.data['data'];
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final imageUrl = response.data['data'] ?? response.data['imageUrl'] ?? response.data['url'];
+        if (imageUrl != null) {
+          return imageUrl.toString();
+        } else {
+          throw Exception("Image URL not found in response");
+        }
       } else {
-        throw Exception("Failed to upload image: ${response.statusCode}");
+        throw Exception("Failed to upload image: ${response.statusCode} - ${response.statusMessage}");
       }
     } on DioException catch (e) {
+      print('DioException in uploadProfilePicture: ${e.response?.data ?? e.message}');
+      print('DioException status: ${e.response?.statusCode}');
       throw Exception('Failed to upload picture: ${e.response?.data ?? e.message}');
     } catch (e) {
+      print('Unexpected error in uploadProfilePicture: $e');
       throw Exception('An unexpected error occurred: $e');
     }
   }
