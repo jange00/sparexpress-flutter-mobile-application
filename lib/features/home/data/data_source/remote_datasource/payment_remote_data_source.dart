@@ -76,6 +76,13 @@ class PaymentRemoteDataSource implements IPaymentRemoteDataSource {
       return models.map((e) => e.toEntity()).toList();
     } catch (e) {
       print('[PaymentRemoteDataSource] ERROR: ${e.toString()}');
+      // If the error indicates no payments found, return empty list instead of throwing
+      if (e.toString().contains('No payments found for this user') || 
+          e.toString().contains('404') ||
+          e.toString().contains('not found')) {
+        print('[PaymentRemoteDataSource] No payments found, returning empty list');
+        return [];
+      }
       throw Exception('Failed to load payments: ${e.toString()}');
     }
   }

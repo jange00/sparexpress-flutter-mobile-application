@@ -55,13 +55,42 @@ class PaymentOverlay extends StatelessWidget {
                         final payments = state.payments;
                         if (payments.isEmpty) {
                           content = Column(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const SizedBox(height: 48),
-                              Icon(Icons.receipt_long, size: 56, color: colorScheme.primary.withOpacity(0.3)),
-                              const SizedBox(height: 16),
-                              Text('No payment history.', style: textTheme.titleMedium?.copyWith(color: colorScheme.onSurface.withOpacity(0.7))),
-                              const SizedBox(height: 48),
+                              // Header with close button
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(24, 24, 16, 0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Payment History', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                                    IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      tooltip: 'Close',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Empty state content
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.payment_outlined, size: 80, color: Colors.grey[300]),
+                                    const SizedBox(height: 24),
+                                    const Text(
+                                      'No payment history yet!',
+                                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black54),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      'Looks like you haven\'t made any payments yet.\nYour payment history will appear here!',
+                                      style: TextStyle(fontSize: 15, color: Colors.black45),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           );
                         } else {
@@ -137,24 +166,44 @@ class PaymentOverlay extends StatelessWidget {
                         }
                       } else if (state is PaymentFailure) {
                         content = Column(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: 48),
-                            Icon(Icons.error_outline, size: 56, color: colorScheme.error.withOpacity(0.3)),
-                            const SizedBox(height: 16),
-                            Text('Failed to load payments.', style: textTheme.titleMedium?.copyWith(color: colorScheme.error)),
+                            // Header with close button
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24),
-                              child: Text(state.error, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)), textAlign: TextAlign.center),
+                              padding: const EdgeInsets.fromLTRB(24, 24, 16, 0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Payment History', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    tooltip: 'Close',
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 8),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Retry'),
-                              onPressed: () => context.read<PaymentBloc>().add(FetchPaymentHistory()),
-                              style: ElevatedButton.styleFrom(minimumSize: const Size(120, 40)),
+                            // Error content
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.error_outline, size: 56, color: colorScheme.error.withOpacity(0.3)),
+                                  const SizedBox(height: 16),
+                                  Text('Failed to load payments.', style: textTheme.titleMedium?.copyWith(color: colorScheme.error)),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24),
+                                    child: Text(state.error, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)), textAlign: TextAlign.center),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.refresh),
+                                    label: const Text('Retry'),
+                                    onPressed: () => context.read<PaymentBloc>().add(FetchPaymentHistory()),
+                                    style: ElevatedButton.styleFrom(minimumSize: const Size(120, 40)),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 48),
                           ],
                         );
                       } else {
