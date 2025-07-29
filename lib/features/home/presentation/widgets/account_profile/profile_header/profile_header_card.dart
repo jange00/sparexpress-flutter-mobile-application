@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_state.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
@@ -29,7 +30,7 @@ class ProfileHeaderCard extends StatelessWidget {
       if (profileImage.startsWith('http')) {
         return profileImage;
       }
-      return 'http://localhost:3000/$profileImage';
+      return '${ApiEndpoints.serverAddress}/$profileImage';
     }
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, state) {

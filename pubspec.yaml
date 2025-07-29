@@ -69,6 +69,8 @@ dependencies:
   proximity_sensor: ^1.0.3
   local_auth: ^2.1.7
   flutter_paypal: ^0.2.1
+
+  
   # esewa_flutter_sdk: ^2.0.1
 
 dev_dependencies:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_state.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_event.dart';
@@ -38,7 +39,7 @@ class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidg
                   ),
                 ],
               ),
-              padding: const EdgeInsets.fromLTRB(20, 48, 20, 20),
+              padding: const EdgeInsets.fromLTRB(20, 48, 20, 8),
               child: BlocBuilder<ProfileBloc, ProfileState>(
                 builder: (context, state) {
                   if (state is ProfileLoading) {
@@ -57,7 +58,7 @@ class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidg
                       if (profileImage.startsWith('http')) {
                         return profileImage;
                       }
-                      return 'http://localhost:3000/$profileImage';
+                      return '${ApiEndpoints.serverAddress}/$profileImage';
                     }
                     final imageUrl = getProfileImageUrl(user.profileImage);
                     ImageProvider avatarProvider;
@@ -72,6 +73,7 @@ class CustomDashboardAppBar extends StatelessWidget implements PreferredSizeWidg
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min, // Fix overflow
                             children: [
                               Row(
                                 children: [

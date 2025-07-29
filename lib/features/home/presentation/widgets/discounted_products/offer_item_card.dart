@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 // import 'package:sparexpress/features/home/presentation/view/product_detail_view.dart';
 
@@ -54,7 +55,7 @@ class OfferItemCard extends StatelessWidget {
               child: Stack(
                 children: [
                   CachedNetworkImage(
-                    imageUrl: "http://localhost:3000/${product.image.first}",
+                    imageUrl: "${ApiEndpoints.serverAddress}/${product.image.first}",
                     height: 100,
                     width: double.infinity,
                     fit: BoxFit.cover,

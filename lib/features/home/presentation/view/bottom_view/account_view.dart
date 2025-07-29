@@ -31,6 +31,16 @@ class AccountView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => serviceLocator<AccountBloc>(),
+      child: _AccountViewContent(),
+    );
+  }
+}
+
+class _AccountViewContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeModeNotifier>(context);
     final isDark = themeNotifier.themeMode == ThemeMode.dark ||
         (themeNotifier.themeMode == ThemeMode.system &&
@@ -61,7 +71,7 @@ class AccountView extends StatelessWidget {
         }
         if (state is AccountDeleteFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${state.message}')),
+            SnackBar(content: Text('Error:  {state.message}')),
           );
         }
       },
@@ -152,10 +162,6 @@ class AccountView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // const Text(
-                //   "Settings",
-                //   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                // ),
                 const SizedBox(height: 20),
                 ProfileHeaderCard(
                   name: name,
@@ -164,7 +170,6 @@ class AccountView extends StatelessWidget {
                   imageUrl: imageUrl,
                 ),
                 const SizedBox(height: 24),
-                // Theme toggle card
                 ThemeToggleCard(
                   themeMode: themeNotifier.themeMode,
                   onChanged: (mode) => themeNotifier.setThemeMode(mode),
@@ -184,7 +189,6 @@ class AccountView extends StatelessWidget {
                   onTap: () {
                     showDialog(
                       context: context,
-                      // We don't want the user to accidentally dismiss it while typing or loading
                       barrierDismissible: false,
                       builder: (context) => const ContactUsOverlay(),
                     );
@@ -201,7 +205,6 @@ class AccountView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 16),
-                // Expanded(child: const AboutUsCard()),
                 const AboutUsCard(),
                 const SizedBox(height: 16),
                 LogoutCard(blocContext: context),

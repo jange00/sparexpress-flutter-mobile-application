@@ -56,7 +56,7 @@ class ShakeLogoutProvider extends ChangeNotifier {
     print('[ShakeLogoutProvider] _showLogoutDialog called');
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false, // Prevent dismissing by tapping outside or back
       builder: (context) => AlertDialog(
         title: const Text('Confirm Logout'),
         content: const Text('Are you sure you want to logout from your account?'),

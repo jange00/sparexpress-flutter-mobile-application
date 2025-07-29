@@ -65,6 +65,7 @@ import 'package:sparexpress/features/auth/data/data_source/remote_datasource/use
 import 'package:sparexpress/features/auth/data/repository/remote_repository/user_remote_repository.dart';
 import 'package:sparexpress/features/auth/domain/repository/user_repository.dart';
 import 'package:sparexpress/features/auth/domain/use_case/delete_user_usecase.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/account_view_model/account_bloc.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -192,6 +193,10 @@ Future <void> _initAuthModule() async {
 Future<void> _initHomeModel() async {
   serviceLocator.registerFactory(
     () => HomeViewModel(loginViewModel: serviceLocator<LoginViewModel>()),
+  );
+  // Register AccountBloc
+  serviceLocator.registerFactory<AccountBloc>(
+    () => AccountBloc(),
   );
 }
 
