@@ -38,7 +38,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   TextEditingController? _searchController;
     StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
-  final double _shakeThreshold = 55.0;
+  final double _shakeThreshold = 105.0;
   bool _isDialogShowing = false;
   @override
   void initState() {
@@ -51,6 +51,7 @@ void _onAccelerometerEvent(AccelerometerEvent event) {
     final double acceleration = sqrt(
       event.x * event.x + event.y * event.y + event.z * event.z,
     );
+    print('Acceleration: $acceleration');
     if (acceleration > _shakeThreshold && !_isDialogShowing) {
       _showLogoutDialog();
     }
@@ -250,7 +251,7 @@ class _HomeViewContentState extends State<_HomeViewContent> {
                     ),
                     onPressed: () {
                       Navigator.of(dialogContext).pop();
-                      _isDialogShowing = false;
+                      // _isDialogShowing = false; // Remove direct set here
                     },
                     child: Text(
                       'Cancel',
@@ -282,7 +283,7 @@ class _HomeViewContentState extends State<_HomeViewContent> {
                         create: (_) => serviceLocator<LoginViewModel>(),
                         child: LoginView(),
                       )));
-                      _isDialogShowing = false;
+                      // _isDialogShowing = false; // Remove direct set here
                     },
                     child: Text(
                       'Logout',
@@ -298,7 +299,9 @@ class _HomeViewContentState extends State<_HomeViewContent> {
           ),
         ],
       ),
-    );
+    ).then((_) {
+      if (mounted) setState(() => _isDialogShowing = false);
+    });
   }
 
   @override
