@@ -1,17 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/profile_header/update_user_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
+  final String userId;
   final String name;
   final String email;
   final String phoneNumber;
+  final String? profileImageUrl;
 
   const EditProfileScreen({
     super.key,
+    required this.userId,
     required this.name,
     required this.email,
     required this.phoneNumber,
+    this.profileImageUrl,
   });
 
   @override
@@ -27,6 +32,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   File? _pickedImageFile;
   final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -63,14 +69,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     Navigator.of(context).pop();
   }
 
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.of(context).pop({
-        "name": _nameController.text.trim(),
-        "email": _emailController.text.trim(),
-        "phone": _phoneController.text.trim(),
-        "imageFile": _pickedImageFile,
-      });
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+    try {
+      final updatedUser = await updateUserProfile(
+        userId: widget.userId,
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        imageFile: _pickedImageFile,
+      );
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully!')),
+      );
+      Navigator.of(context).pop(updatedUser);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $e')),
+      );
     }
   }
 
@@ -107,17 +127,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   backgroundColor: Colors.grey[200],
                   backgroundImage: _pickedImageFile != null
                       ? FileImage(_pickedImageFile!)
-                      : (widget.name.isNotEmpty
-                          ? null
-                          : const AssetImage("assets/images/default_avatar.png")
-                              as ImageProvider),
-                  child: _pickedImageFile == null && widget.name.isNotEmpty
-                      ? null
-                      : const Icon(
+                      : (widget.profileImageUrl != null && widget.profileImageUrl!.isNotEmpty
+                          ? NetworkImage(widget.profileImageUrl!)
+                          : const AssetImage("assets/images/default_avatar.png") as ImageProvider),
+                  child: _pickedImageFile == null && (widget.profileImageUrl == null || widget.profileImageUrl!.isEmpty)
+                      ? const Icon(
                           Icons.person,
                           size: 60,
                           color: Colors.grey,
-                        ),
+                        )
+                      : null,
                 ),
                 Positioned(
                   bottom: -4,
@@ -221,8 +240,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: _saveProfile,
-                    child: const Text('Save'),
+                    onPressed: _isLoading ? null : _saveProfile,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(strokeWidth: 3),
+                          )
+                        : const Text('Save'),
                   ),
                 ),
               ],

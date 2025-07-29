@@ -7,5 +7,9 @@ abstract interface class ICustomerDataSource{
 
   Future<String> uploadProfilePicture(String filePath);
 
-  // Future<StudentEntity> getCurrentUser();
+  Future<CustomerEntity> getCurrentUser();
+
+  // Forgot Password Methods
+  Future<void> requestPasswordReset(String email);
+  Future<void> resetPassword(String token, String newPassword);
 }

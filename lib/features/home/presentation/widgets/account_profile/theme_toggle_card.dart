@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ThemeToggleCard extends StatelessWidget {
-  final bool isDarkMode;
-  final ValueChanged<bool> onChanged;
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onChanged;
 
   const ThemeToggleCard({
     Key? key,
-    required this.isDarkMode,
+    required this.themeMode,
     required this.onChanged,
   }) : super(key: key);
 
@@ -18,19 +18,38 @@ class ThemeToggleCard extends StatelessWidget {
       elevation: 4,
       child: ListTile(
         leading: Icon(
-          isDarkMode ? Icons.dark_mode : Icons.light_mode,
+          themeMode == ThemeMode.dark
+              ? Icons.dark_mode
+              : themeMode == ThemeMode.light
+                  ? Icons.light_mode
+                  : Icons.brightness_auto,
           color: theme.colorScheme.primary,
         ),
         title: const Text(
-          "Dark Mode",
+          "Theme",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        trailing: Switch(
-          value: isDarkMode,
-          onChanged: onChanged,
-          activeColor: theme.colorScheme.primary,
+        trailing: DropdownButton<ThemeMode>(
+          value: themeMode,
+          underline: const SizedBox(),
+          onChanged: (mode) {
+            if (mode != null) onChanged(mode);
+          },
+          items: const [
+            DropdownMenuItem(
+              value: ThemeMode.system,
+              child: Text('Auto'),
+            ),
+            DropdownMenuItem(
+              value: ThemeMode.light,
+              child: Text('Light'),
+            ),
+            DropdownMenuItem(
+              value: ThemeMode.dark,
+              child: Text('Dark'),
+            ),
+          ],
         ),
-        onTap: () => onChanged(!isDarkMode),
       ),
     );
   }

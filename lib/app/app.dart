@@ -21,7 +21,8 @@ class ThemeModeNotifier extends ChangeNotifier {
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final Widget Function(BuildContext, Widget?)? builder;
+  const App({super.key, this.builder});
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,7 @@ class App extends StatelessWidget {
               value: serviceLocator<SplashViewModel>(),
               child: SplashView(),
             ),
+            builder: builder,
           );
         },
       ),

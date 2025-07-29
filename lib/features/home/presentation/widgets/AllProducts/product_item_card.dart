@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:sparexpress/features/home/presentation/widgets/product_detail/product_detail_view.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/profile_view_model/profile_bloc.dart';
@@ -62,7 +63,7 @@ class ProductItemCard extends StatelessWidget {
                         children: [
                           product.image.isNotEmpty
                               ? CachedNetworkImage(
-                                  imageUrl: "http://localhost:3000/${product.image.first}",
+                                  imageUrl: "${ApiEndpoints.serverAddress}/${product.image.first}",
                                   height: 90,
                                   width: double.infinity,
                                   fit: BoxFit.cover,

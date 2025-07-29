@@ -12,6 +12,8 @@ import 'package:sparexpress/features/auth/domain/use_case/customer_get_current_u
 import 'package:sparexpress/features/auth/domain/use_case/customer_image_upload_usecase.dart';
 import 'package:sparexpress/features/auth/domain/use_case/customer_login_usecase.dart';
 import 'package:sparexpress/features/auth/domain/use_case/customer_register_usecase.dart';
+import 'package:sparexpress/features/auth/domain/use_case/customer_request_reset_usecase.dart';
+import 'package:sparexpress/features/auth/domain/use_case/customer_reset_password_usecase.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/cart_remote_data_source.dart';
@@ -57,6 +59,13 @@ import 'package:sparexpress/features/home/domin/use_case/order/create_order_usec
 import 'package:sparexpress/features/home/domin/use_case/payment/create_payment_usecase.dart';
 import 'package:sparexpress/features/home/data/data_source/remote_datasource/payment_remote_data_source.dart';
 import 'package:sparexpress/features/home/data/repository/remote_repository/payment_remote_repository.dart';
+import 'package:sparexpress/features/home/domin/use_case/payment/get_all_payment_usecase.dart';
+import 'package:sparexpress/features/home/domin/use_case/order/delete_order_usecase.dart';
+import 'package:sparexpress/features/auth/data/data_source/remote_datasource/user_remote_datasource.dart';
+import 'package:sparexpress/features/auth/data/repository/remote_repository/user_remote_repository.dart';
+import 'package:sparexpress/features/auth/domain/repository/user_repository.dart';
+import 'package:sparexpress/features/auth/domain/use_case/delete_user_usecase.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/account_view_model/account_bloc.dart';
 
 
 final serviceLocator = GetIt.instance;
@@ -130,6 +139,18 @@ Future <void> _initAuthModule() async {
     ),
   );
 
+  serviceLocator.registerLazySingleton<CustomerRequestResetUseCase>(
+    () => CustomerRequestResetUseCase(
+      customerRepository: serviceLocator<CustomerRemoteRepository>(),
+    ),
+  );
+
+  serviceLocator.registerLazySingleton<CustomerResetPasswordUseCase>(
+    () => CustomerResetPasswordUseCase(
+      customerRepository: serviceLocator<CustomerRemoteRepository>(),
+    ),
+  );
+
   serviceLocator.registerLazySingleton<CustomerImageUploadUseCase>(
     () => CustomerImageUploadUseCase(
       customerRepository: serviceLocator<CustomerRemoteRepository>(),
@@ -157,12 +178,25 @@ Future <void> _initAuthModule() async {
   serviceLocator.registerFactory(() => ProfileBloc(
   getCurrentCustomer: serviceLocator<CustomerGetCurrentUseCase>(),
 ));
+  serviceLocator.registerFactory<UserRemoteDatasource>(
+    () => UserRemoteDatasource(apiService: serviceLocator<ApiService>()),
+  );
+  serviceLocator.registerFactory<IUserRepository>(
+    () => UserRemoteRepository(remoteDatasource: serviceLocator<UserRemoteDatasource>()),
+  );
+  serviceLocator.registerFactory<DeleteUserUsecase>(
+    () => DeleteUserUsecase(repository: serviceLocator<IUserRepository>()),
+  );
 }
 
 // Home
 Future<void> _initHomeModel() async {
   serviceLocator.registerFactory(
     () => HomeViewModel(loginViewModel: serviceLocator<LoginViewModel>()),
+  );
+  // Register AccountBloc
+  serviceLocator.registerFactory<AccountBloc>(
+    () => AccountBloc(),
   );
 }
 
@@ -292,6 +326,9 @@ Future<void> _initOrderModule() async {
   serviceLocator.registerFactory<CreateOrderUsecase>(
     () => CreateOrderUsecase(repository: serviceLocator<OrderRemoteRepository>()),
   );
+  serviceLocator.registerFactory<DeleteOrderUsecase>(
+    () => DeleteOrderUsecase(repository: serviceLocator<OrderRemoteRepository>()),
+  );
   // Bloc
   serviceLocator.registerFactory<OrderBloc>(
     () => OrderBloc(
@@ -315,6 +352,9 @@ Future<void> _initPaymentModule() async {
   );
   serviceLocator.registerFactory<CreatePaymentUsecase>(
     () => CreatePaymentUsecase(repository: serviceLocator<PaymentRemoteRepository>()),
+  );
+  serviceLocator.registerFactory<GetAllPaymentUsecase>(
+    () => GetAllPaymentUsecase(repository: serviceLocator<PaymentRemoteRepository>()),
   );
 }
 

@@ -14,4 +14,8 @@ abstract interface class ICustomerRepository{
     Future<Either<Failure, String>> uploadProfilePicture(File file);
 
   Future<Either<Failure, CustomerEntity>> getCurrentUser();
+
+  // Forgot Password Methods
+  Future<Either<Failure, void>> requestPasswordReset(String email);
+  Future<Either<Failure, void>> resetPassword(String token, String newPassword);
 }

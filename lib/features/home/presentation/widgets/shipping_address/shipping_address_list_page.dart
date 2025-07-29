@@ -11,7 +11,11 @@ class ShippingAddressListPage extends StatelessWidget {
   final String userId;
   final Function(ShippingAddressEntity) onAddressSelected;
 
-  const ShippingAddressListPage({super.key, required this.userId, required this.onAddressSelected});
+  const ShippingAddressListPage({
+    super.key,
+    required this.userId,
+    required this.onAddressSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +33,12 @@ class ShippingAddressListPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => BlocProvider(
-                          create: (_) => serviceLocator<ShippingAddressBloc>(),
-                          child: ShippingAddressFormPage(userId: userId),
-                        ),
+                        builder:
+                            (_) => BlocProvider(
+                              create:
+                                  (_) => serviceLocator<ShippingAddressBloc>(),
+                              child: ShippingAddressFormPage(userId: userId),
+                            ),
                       ),
                     );
                   },
@@ -42,20 +48,24 @@ class ShippingAddressListPage extends StatelessWidget {
             }
             return ListView(
               children: [
-                ...state.addresses.map((address) => ListTile(
-                  title: Text(address.streetAddress),
-                  subtitle: Text('${address.city}, ${address.country}'),
-                  onTap: () => onAddressSelected(address),
-                )),
+                ...state.addresses.map(
+                  (address) => ListTile(
+                    title: Text(address.streetAddress),
+                    subtitle: Text('${address.city}, ${address.country}'),
+                    onTap: () => onAddressSelected(address),
+                  ),
+                ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => BlocProvider(
-                          create: (_) => serviceLocator<ShippingAddressBloc>(),
-                          child: ShippingAddressFormPage(userId: userId),
-                        ),
+                        builder:
+                            (_) => BlocProvider(
+                              create:
+                                  (_) => serviceLocator<ShippingAddressBloc>(),
+                              child: ShippingAddressFormPage(userId: userId),
+                            ),
                       ),
                     );
                   },
@@ -71,4 +81,4 @@ class ShippingAddressListPage extends StatelessWidget {
       ),
     );
   }
-} 
+}

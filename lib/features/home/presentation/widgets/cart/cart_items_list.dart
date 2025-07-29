@@ -17,7 +17,25 @@ class CartListView extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is CartLoaded) {
           if (state.items.isEmpty) {
-            return const Center(child: Text('Your cart is empty.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[300]),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Your cart is empty!',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Looks like you haven\'t added any items yet.\nStart shopping and your items will appear here!',
+                    style: TextStyle(fontSize: 15, color: Colors.black45),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
           }
           return ListView.builder(
             itemCount: state.items.length,

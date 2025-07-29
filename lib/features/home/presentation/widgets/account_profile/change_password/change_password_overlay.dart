@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/change_password/change_password_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/change_password/change_password_event.dart';
 import 'package:sparexpress/features/home/presentation/view_model/account/change_password/change_password_state.dart';
+import 'package:sparexpress/features/home/presentation/widgets/account_profile/change_password/change_password_service.dart';
 
 class ChangePasswordOverlay extends StatefulWidget {
   const ChangePasswordOverlay({super.key});
@@ -22,6 +23,7 @@ class _ChangePasswordOverlayState extends State<ChangePasswordOverlay> {
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -61,6 +63,28 @@ class _ChangePasswordOverlayState extends State<ChangePasswordOverlay> {
         borderSide: BorderSide(color: colorScheme.error, width: 2),
       ),
     );
+  }
+
+  Future<void> _handleChangePassword(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+    try {
+      await changePassword(
+        currentPassword: _currentPassController.text.trim(),
+        newPassword: _newPassController.text.trim(),
+      );
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password changed successfully!')),
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to change password: $e')),
+      );
+    }
   }
 
   @override
@@ -258,33 +282,16 @@ class _ChangePasswordOverlayState extends State<ChangePasswordOverlay> {
                                 )
                               : SizedBox(
                                   width: double.infinity,
+                                  height: 54,
                                   child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
-                                      textStyle: textTheme.titleMedium
-                                          ?.copyWith(
-                                              fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        context.read<ChangePasswordBloc>().add(
-                                              ChangePasswordSubmitted(
-                                                oldPassword:
-                                                    _currentPassController.text
-                                                        .trim(),
-                                                newPassword: _newPassController
-                                                    .text
-                                                    .trim(),
-                                              ),
-                                            );
-                                      }
-                                    },
-                                    child: const Text('Save Changes'),
+                                    onPressed: _isLoading ? null : () => _handleChangePassword(context),
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            width: 28,
+                                            height: 28,
+                                            child: CircularProgressIndicator(strokeWidth: 3),
+                                          )
+                                        : const Text('Change Password'),
                                   ),
                                 ),
                         ],

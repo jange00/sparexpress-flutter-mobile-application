@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/features/home/domin/entity/products_entity.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_detail/product_detail_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/product_detail/product_detail_event.dart';
@@ -295,7 +296,7 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                       borderRadius: BorderRadius.circular(20),
                                       child: CachedNetworkImage(
                                         imageUrl: product.image.isNotEmpty
-                                            ? "http://localhost:3000/${product.image[i]}"
+                                            ? "${ApiEndpoints.serverAddress}/${product.image[i]}"
                                             : '',
                                         fit: BoxFit.cover,
                                         placeholder: (_, __) => const SizedBox(
@@ -371,7 +372,7 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: CachedNetworkImage(
-                                          imageUrl: "http://localhost:3000/${product.image[i]}",
+                                          imageUrl: "${ApiEndpoints.serverAddress}/${product.image[i]}",
                                           width: 48,
                                           height: 48,
                                           fit: BoxFit.cover,
@@ -859,7 +860,42 @@ class _ProductDetailViewBodyState extends State<ProductDetailViewBody> {
                                                                 },
                                                               );
                                                             } else if (state is ShippingAddressError) {
-                                                              return Center(child: Text(state.message));
+                                                              // Show dialog asking user to add shipping address first
+                                                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                                showDialog(
+                                                                  context: sheetContext,
+                                                                  barrierDismissible: false,
+                                                                  builder: (context) => AlertDialog(
+                                                                    title: const Text('Shipping Address Required'),
+                                                                    content: const Text('Please add a shipping address before proceeding with checkout.'),
+                                                                    actions: [
+                                                                      TextButton(
+                                                                        onPressed: () {
+                                                                          Navigator.of(context).pop(); // Close dialog
+                                                                          Navigator.of(sheetContext).pop(); // Close bottom sheet
+                                                                        },
+                                                                        child: const Text('Cancel'),
+                                                                      ),
+                                                                      ElevatedButton(
+                                                                        onPressed: () {
+                                                                          Navigator.of(context).pop(); // Close dialog
+                                                                          Navigator.push(
+                                                                            sheetContext,
+                                                                            MaterialPageRoute(
+                                                                              builder: (_) => BlocProvider(
+                                                                                create: (_) => serviceLocator<ShippingAddressBloc>(),
+                                                                                child: ShippingAddressFormPage(userId: userId),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                        child: const Text('Add Address'),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                );
+                                                              });
+                                                              return const SizedBox.shrink(); // Return empty widget since dialog will show
                                                             }
                                                             return const SizedBox.shrink();
                                                           },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/app/constant/api_endpoints.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_bloc.dart';
 import 'package:sparexpress/features/home/presentation/view_model/dashboard/product_view_model/product_state.dart';
@@ -186,7 +187,7 @@ class ProductListWidget extends StatelessWidget {
                           userId: userId,
                           productId: product.productId ?? '',
                           name: product.name,
-                          imageUrl: product.image.isNotEmpty ? 'http://localhost:3000/${product.image.first}' : '',
+                          imageUrl: product.image.isNotEmpty ? '${ApiEndpoints.serverAddress}/${product.image.first}' : '',
                           price: product.price,
                           quantity: 1,
                         );

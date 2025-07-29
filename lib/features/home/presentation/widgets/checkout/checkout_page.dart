@@ -9,6 +9,18 @@ import 'package:sparexpress/features/home/domin/entity/cart_entity.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'dart:ui';
+import 'package:flutter_paypal/flutter_paypal.dart';
+
+// Top-level SectionHeader widget for visual hierarchy
+class SectionHeader extends StatelessWidget {
+  final String title;
+  const SectionHeader(this.title, {super.key});
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 4),
+    child: Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, letterSpacing: 0.2)),
+  );
+}
 
 class CheckoutPage extends StatefulWidget {
   final String userId;
@@ -32,14 +44,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     {
       'key': 'esewa',
       'label': 'eSewa',
-      'icon': Icons.account_balance_wallet,
-      'color': Color(0xFF1EB564),
+      'icon': null,
+      'color': Color(0xFF1EB564), // eSewa green
+      'logoUrl': 'https://media.licdn.com/dms/image/sync/v2/D4D27AQG8vY0HJvndiA/articleshare-shrink_800/articleshare-shrink_800/0/1734856652596?e=2147483647&v=beta&t=Bv2nRIjUfQqm01SIrVrfe4kBIeZLA-FAAf4RgwbKpMg',
     },
     {
       'key': 'khalti',
       'label': 'Khalti',
-      'icon': Icons.account_balance,
+      'icon': null,
       'color': Color(0xFF5F259F),
+      'logoUrl': 'https://blog.khalti.com/wp-content/uploads/2021/01/khalti-icon.png',
     },
     {
       'key': 'bank',
@@ -49,9 +63,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     },
     {
       'key': 'cod',
-      'label': 'Cash on Delivery',
+      'label': 'COD',
       'icon': Icons.money,
       'color': Color(0xFF795548),
+    },
+    {
+      'key': 'paypal',
+      'label': 'PayPal',
+      'icon': null, // We'll use a logo image
+      'color': Color(0xFF003087),
+      'logoUrl': 'https://www.paypalobjects.com/webstatic/icon/pp258.png',
     },
   ];
 
@@ -211,97 +232,100 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 products.add(Map<String, String>.from(currentProduct));
               }
               return SingleChildScrollView(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Product Cards
-                    ...products.map((product) => Card(
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          margin: const EdgeInsets.only(bottom: 14),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: product['image'] != null && product['image']!.isNotEmpty
-                                      ? CachedNetworkImage(
-                                          imageUrl: product['image']!,
-                                          width: 70,
-                                          height: 70,
-                                          fit: BoxFit.cover,
-                                          placeholder: (_, __) => Container(
-                                            width: 70,
-                                            height: 70,
-                                            color: Colors.grey[200],
-                                            child: const Icon(Icons.shopping_bag, size: 36, color: Colors.deepOrange),
+                    const SectionHeader('Order Items'),
+                    SizedBox(
+                      height: 120,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: products.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (context, i) {
+                          final product = products[i];
+                          return Container(
+                            width: 220,
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: product['image'] != null && product['image']!.isNotEmpty
+                                        ? CachedNetworkImage(
+                                            imageUrl: product['image']!,
+                                            width: 60,
+                                            height: 60,
+                                            fit: BoxFit.cover,
+                                            placeholder: (_, __) => Container(
+                                              width: 60,
+                                              height: 60,
+                                              color: Colors.grey[200],
+                                              child: const Icon(Icons.shopping_bag, size: 30, color: Colors.deepOrange),
+                                            ),
+                                            errorWidget: (_, __, ___) => Container(
+                                              width: 60,
+                                              height: 60,
+                                              color: Colors.grey[200],
+                                              child: const Icon(Icons.broken_image, size: 30, color: Colors.grey),
+                                            ),
+                                          )
+                                        : Container(
+                                            width: 60,
+                                            height: 60,
+                                            color: Colors.grey[100],
+                                            child: const Icon(Icons.shopping_bag, size: 30, color: Colors.deepOrange),
                                           ),
-                                          errorWidget: (_, __, ___) => Container(
-                                            width: 70,
-                                            height: 70,
-                                            color: Colors.grey[200],
-                                            child: const Icon(Icons.broken_image, size: 36, color: Colors.grey),
-                                          ),
-                                        )
-                                      : Container(
-                                          width: 70,
-                                          height: 70,
-                                          color: Colors.grey[100],
-                                          child: const Icon(Icons.shopping_bag, size: 36, color: Colors.deepOrange),
-                                        ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(product['name'] ?? '', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 2),
+                                          Text(product['price'] ?? '', style: const TextStyle(fontSize: 15, color: Colors.deepOrange)),
+                                          Text('Qty: ${product['quantity'] ?? ''}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(product['name'] ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 4),
-                                      Text(product['price'] ?? '', style: const TextStyle(fontSize: 15, color: Colors.deepOrange)),
-                                      const SizedBox(height: 2),
-                                      Text('Quantity: ${product['quantity'] ?? ''}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
-                                      if (product['shipping'] != null && product['shipping']!.isNotEmpty)
-                                        Text('Shipping: ${product['shipping']}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        )),
-                    // Shipping Address Card
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const SectionHeader('Shipping Address'),
                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
+                      child: ListTile(
+                        leading: const Icon(Icons.location_on, color: Colors.deepOrange, size: 28),
+                        title: const Text('Shipping Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.location_on, color: Colors.deepOrange, size: 28),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Shipping Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                                  const SizedBox(height: 4),
-                                  Text(address, style: const TextStyle(fontSize: 14)),
-                                  if (postal.isNotEmpty) ...[
-                                    const SizedBox(height: 2),
-                                    Text('Postal Code: $postal', style: const TextStyle(fontSize: 13, color: Colors.grey)),
-                                  ],
-                                ],
-                              ),
-                            ),
+                            Text(address, style: const TextStyle(fontSize: 14)),
+                            if (postal.isNotEmpty) Text('Postal Code: $postal', style: const TextStyle(fontSize: 13, color: Colors.grey)),
                           ],
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.deepOrange),
+                          onPressed: () {/* TODO: Implement address edit */},
                         ),
                       ),
                     ),
                     const SizedBox(height: 18),
-                    // Order Summary
+                    const SectionHeader('Order Summary'),
                     Card(
                       elevation: 1,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -337,59 +361,71 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 28),
-                    // Payment Method Selection
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          const SizedBox(height: 10),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: _paymentMethods.map((method) {
-                                final isSelected = _selectedPayment == method['key'];
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedPayment = method['key'];
-                                    });
-                                  },
-                                  child: Card(
-                                    color: isSelected ? method['color'].withOpacity(0.15) : Colors.white,
-                                    elevation: isSelected ? 4 : 1,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      side: BorderSide(
-                                        color: isSelected ? method['color'] : Colors.grey.shade300,
-                                        width: isSelected ? 2 : 1,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                                      child: Column(
-                                        children: [
-                                          Icon(method['icon'], color: method['color'], size: 32),
-                                          const SizedBox(height: 6),
-                                          Text(method['label'], style: TextStyle(fontWeight: FontWeight.w600, color: isSelected ? method['color'] : Colors.black87)),
-                                        ],
-                                      ),
-                                    ),
+                    const SizedBox(height: 24),
+                    const SectionHeader('Payment Method'),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _paymentMethods.map((method) {
+                          final isSelected = _selectedPayment == method['key'];
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.only(right: 12),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedPayment = method['key'];
+                                });
+                              },
+                              child: Card(
+                                color: isSelected ? method['color'].withOpacity(0.15) : Colors.white,
+                                elevation: isSelected ? 6 : 1,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color: isSelected ? method['color'] : Colors.grey.shade300,
+                                    width: isSelected ? 2 : 1,
                                   ),
-                                );
-                              }).toList(),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                                  child: Column(
+                                    children: [
+                                      method['logoUrl'] != null
+                                          ? Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                color: method['key'] == 'esewa' ? method['color'] : Colors.transparent,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(4.0),
+                                                child: ClipOval(
+                                                  child: Image.network(
+                                                    method['logoUrl'],
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : Icon(method['icon'], color: method['color'], size: 32),
+                                      const SizedBox(height: 6),
+                                      Text(method['label'], style: TextStyle(fontWeight: FontWeight.w600, color: isSelected ? method['color'] : Colors.black87)),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          );
+                        }).toList(),
                       ),
                     ),
-                    // Confirm Button
+                    const SizedBox(height: 28),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () async {
+                        onPressed: state is CheckoutLoading ? null : () async {
                           if (_selectedPayment == 'esewa') {
                             // TODO: Implement eSewa payment integration (WebView)
                             // Show a dialog or WebView for eSewa payment
@@ -413,6 +449,76 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               ),
                             );
                             context.read<CheckoutBloc>().add(ConfirmOrder('cod'));
+                          } else if (_selectedPayment == 'paypal') {
+                            // PayPal payment integration using actual cartItems
+                            final cartItems = widget.cartItems;
+                            if (cartItems.isEmpty) return;
+                            // Example conversion rate: 1 USD = 132 NPR
+                            const nprToUsd = 132.0;
+                            final items = cartItems.map((item) => {
+                              "name": (item.name ?? '').toString(),
+                              "quantity": (item.quantity ?? 1).toString(),
+                              "price": ((item.price ?? 0.0) / nprToUsd).toStringAsFixed(2),
+                              "currency": "USD",
+                            }).toList();
+                            final subtotal = items.fold<double>(
+                              0.0,
+                              (sum, item) => sum + double.parse((item["price"] ?? '0.00').toString()) * int.parse((item["quantity"] ?? '1').toString()),
+                            );
+                            final subtotalStr = subtotal.toStringAsFixed(2);
+                            final title = cartItems.length == 1 ? cartItems[0].name ?? '' : 'Multiple Products';
+                            print('PayPal subtotalStr: $subtotalStr, items: $items');
+                            if (subtotal <= 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Cannot pay zero amount!')),
+                              );
+                              return;
+                            }
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => UsePaypal(
+                                  sandboxMode: true,
+                                  clientId: "AcnpbvL-nqay69eboBK-a2hcQLnkFTQZXbTF0f4UafVwhRYAXe11Z0B3PtFyWCTDH24INY6Cu2U0rhRC",
+                                  secretKey: "EGZXWncK71BKAfqH7ClPpldekK6kSKvO9yIk0Loz36CkdM7uLC_vuE5mjbGjRhJhBT5BeOYyBB-_p6WW",
+                                  returnURL: "https://samplesite.com/return",
+                                  cancelURL: "https://samplesite.com/cancel",
+                                  transactions: [
+                                    {
+                                      "amount": {
+                                        "total": subtotalStr,
+                                        "currency": "USD",
+                                        "details": {
+                                          "subtotal": subtotalStr,
+                                          "shipping": "0.00",
+                                          "shipping_discount": "0.00",
+                                        },
+                                      },
+                                      "description": "Payment for product: $title",
+                                      "item_list": {
+                                        "items": items,
+                                      },
+                                    },
+                                  ],
+                                  note: "Contact us for any questions on your order.",
+                                  onSuccess: (Map params) async {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('PayPal payment successful!')),
+                                    );
+                                    context.read<CheckoutBloc>().add(ConfirmOrder('paypal'));
+                                  },
+                                  onError: (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('PayPal payment error: $error')),
+                                    );
+                                  },
+                                  onCancel: (params) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('PayPal payment cancelled')),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -422,7 +528,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('Confirm & Pay'),
+                        child: state is CheckoutLoading
+                            ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Text('Confirm & Pay'),
                       ),
                     ),
                   ],

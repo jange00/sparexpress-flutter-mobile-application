@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/auth/presentation/view/register_view.dart';
+import 'package:sparexpress/features/auth/presentation/view/forgot_password_view.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
@@ -200,7 +201,12 @@ class LoginView extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () {
-                              // TODO: Implement forgot password logic
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ForgotPasswordView(),
+                                ),
+                              );
                             },
                             child: const Text(
                               "Forgot Password?",
