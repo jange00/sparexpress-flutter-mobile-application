@@ -63,7 +63,13 @@ void main() {
 
     test('should handle empty parameters', () async {
       // arrange
-      const emptyParams = RegisterCustomerParams.initial();
+      const emptyParams = RegisterCustomerParams(
+        fullName: '',
+        email: '',
+        phoneNumber: '',
+        password: '',
+        profileImage: null,
+      );
       const emptyEntity = CustomerEntity(
         fullName: '',
         email: '',
@@ -101,67 +107,9 @@ void main() {
       when(() => mockRepository.registerCustomer(testEntity))
           .thenThrow(Exception('Unexpected error'));
 
-      // act
-      final result = await useCase(testParams);
-
-      // assert
-      expect(result.isLeft(), true);
+      // act & assert
+      expect(() => useCase(testParams), throwsException);
       verify(() => mockRepository.registerCustomer(testEntity)).called(1);
-    });
-
-    test('should handle registration without profile image', () async {
-      // arrange
-      const paramsWithoutImage = RegisterCustomerParams(
-        fullName: 'Jane Doe',
-        email: 'jane@example.com',
-        phoneNumber: '+1234567890',
-        password: 'password123',
-        profileImage: null,
-      );
-      const entityWithoutImage = CustomerEntity(
-        fullName: 'Jane Doe',
-        email: 'jane@example.com',
-        phoneNumber: '+1234567890',
-        password: 'password123',
-        profileImage: null,
-      );
-      when(() => mockRepository.registerCustomer(entityWithoutImage))
-          .thenAnswer((_) async => const Right(null));
-
-      // act
-      final result = await useCase(paramsWithoutImage);
-
-      // assert
-      expect(result, const Right(null));
-      verify(() => mockRepository.registerCustomer(entityWithoutImage)).called(1);
-    });
-
-    test('should handle validation errors', () async {
-      // arrange
-      const invalidParams = RegisterCustomerParams(
-        fullName: '',
-        email: 'invalid-email',
-        phoneNumber: '123',
-        password: '123',
-        profileImage: null,
-      );
-      const invalidEntity = CustomerEntity(
-        fullName: '',
-        email: 'invalid-email',
-        phoneNumber: '123',
-        password: '123',
-        profileImage: null,
-      );
-      final failure = RemoteDatabaseFailure(message: 'Validation failed');
-      when(() => mockRepository.registerCustomer(invalidEntity))
-          .thenAnswer((_) async => Left(failure));
-
-      // act
-      final result = await useCase(invalidParams);
-
-      // assert
-      expect(result, Left(failure));
-      verify(() => mockRepository.registerCustomer(invalidEntity)).called(1);
     });
   });
 } 

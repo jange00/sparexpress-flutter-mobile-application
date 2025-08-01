@@ -7,7 +7,7 @@ class ApiEndpoints {
 
   // static const String serverAddress = "http://localhost:3000";
   // static const String serverAddress = "http://10.0.2.2:3000";
-  static const String serverAddress = "http://192.168.1.73:3000";
+  static const String serverAddress = "http://192.168.1.96:3000";
 
   static const String baseUrl = "$serverAddress/api/";
   static const String imagrUrl = "$serverAddress/uploads/";
