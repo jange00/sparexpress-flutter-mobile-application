@@ -88,7 +88,7 @@ class OfferListWidget extends StatelessWidget {
                           crossAxisCount: 2,
                           mainAxisSpacing: 16,
                           crossAxisSpacing: 16,
-                          childAspectRatio: 0.7,
+                          childAspectRatio: 0.95, // Increased to fix 10-pixel overflow
                         ),
                     itemBuilder: (context, index) {
                       final product = latestFour[index];
