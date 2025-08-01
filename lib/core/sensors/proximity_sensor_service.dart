@@ -15,14 +15,22 @@ class ProximitySensorService {
   Timer? _warningTimer;
   int _nearDuration = 0;
   
-  // Configuration
-  static const int _warningThreshold = 3; // seconds
-  static const int _criticalThreshold = 10; // seconds
-  static const double _checkInterval = 1.0; // seconds
+  // Configuration - Increased sensitivity
+  static const int _warningThreshold = 1; // Reduced from 3 to 1 second
+  static const int _criticalThreshold = 3; // Reduced from 10 to 3 seconds
+  static const double _checkInterval = 0.5; // Reduced from 1.0 to 0.5 seconds for more sensitivity
+  
+  // Sensitivity settings
+  static const double _highSensitivityThreshold = 0.2; // Very sensitive
+  static const double _mediumSensitivityThreshold = 0.5; // Medium sensitive
+  static const double _lowSensitivityThreshold = 1.0; // Less sensitive
+  
+  double _currentSensitivity = _highSensitivityThreshold; // Default to high sensitivity
 
   // Callbacks
   Function(bool)? _onProximityChanged;
   Function(String)? _onWarning;
+  Function()? _onExitRequested; // New callback for exit requests
 
   /// Initialize the proximity sensor service
   Future<bool> initialize(BuildContext context) async {
@@ -102,7 +110,9 @@ class ProximitySensorService {
 
   /// Check if warning thresholds are met
   void _checkWarningThresholds() {
-    if (_nearDuration == _warningThreshold) {
+    final sensitivityThreshold = (_currentSensitivity * 2).round(); // Convert to seconds
+    
+    if (_nearDuration == sensitivityThreshold) {
       _showWarningMessage(
         '⚠️ Device too close!',
         'Please move your device away from your face to prevent eye strain.',
@@ -114,12 +124,16 @@ class ProximitySensorService {
         'Your device is very close to your face. This may cause eye strain and discomfort.',
         Colors.red,
       );
-    } else if (_nearDuration > _criticalThreshold && _nearDuration % 5 == 0) {
+      // Trigger exit request after critical threshold
+      _onExitRequested?.call();
+    } else if (_nearDuration > _criticalThreshold && _nearDuration % 2 == 0) {
       _showWarningMessage(
         '⚠️ Prolonged Close Usage',
         'Consider taking a break and moving your device further away.',
         Colors.red,
       );
+      // Trigger exit request for prolonged usage
+      _onExitRequested?.call();
     }
   }
 
@@ -174,9 +188,41 @@ class ProximitySensorService {
   void setCallbacks({
     Function(bool)? onProximityChanged,
     Function(String)? onWarning,
+    Function()? onExitRequested,
   }) {
     _onProximityChanged = onProximityChanged;
     _onWarning = onWarning;
+    _onExitRequested = onExitRequested;
+  }
+
+  /// Set sensitivity level
+  void setSensitivity(String level) {
+    switch (level.toLowerCase()) {
+      case 'high':
+        _currentSensitivity = _highSensitivityThreshold;
+        break;
+      case 'medium':
+        _currentSensitivity = _mediumSensitivityThreshold;
+        break;
+      case 'low':
+        _currentSensitivity = _lowSensitivityThreshold;
+        break;
+      default:
+        _currentSensitivity = _highSensitivityThreshold;
+    }
+    debugPrint('Proximity sensor sensitivity set to: $level (${_currentSensitivity}s)');
+  }
+
+  /// Get current sensitivity level
+  String getSensitivityLevel() {
+    if (_currentSensitivity == _highSensitivityThreshold) return 'high';
+    if (_currentSensitivity == _mediumSensitivityThreshold) return 'medium';
+    return 'low';
+  }
+
+  /// Request app exit (to be called from UI)
+  void requestExit() {
+    _onExitRequested?.call();
   }
 
   /// Get current proximity state

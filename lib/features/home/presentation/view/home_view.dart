@@ -164,6 +164,13 @@ class _HomeViewContentState extends State<_HomeViewContent> {
   bool _isDialogShowing = false;
   StreamSubscription<int>? _proximitySubscription;
   bool _isProximityDialogShowing = false;
+  
+  // Proximity sensor sensitivity settings
+  bool _isNear = false;
+  Timer? _proximityTimer;
+  int _proximityDuration = 0;
+  static const int _proximityThreshold = 1; // Reduced from immediate to 1 second
+  static const int _proximityCheckInterval = 500; // Check every 500ms for more sensitivity
 
   @override
   void initState() {
@@ -182,9 +189,41 @@ class _HomeViewContentState extends State<_HomeViewContent> {
   }
 
   void _onProximityEvent(int event) {
-    if (event > 0 && !_isProximityDialogShowing) {
-      _showProximityExitDialog();
+    final bool wasNear = _isNear;
+    _isNear = (event > 0);
+    
+    // More sensitive: trigger on any proximity change
+    if (_isNear && !wasNear) {
+      // Device just got near - start timer
+      _startProximityTimer();
+    } else if (!_isNear && wasNear) {
+      // Device moved away - reset timer
+      _resetProximityTimer();
     }
+  }
+
+  void _startProximityTimer() {
+    _resetProximityTimer(); // Clear any existing timer
+    _proximityDuration = 0;
+    
+    _proximityTimer = Timer.periodic(
+      Duration(milliseconds: _proximityCheckInterval),
+      (timer) {
+        _proximityDuration++;
+        
+        // Check if threshold is met (more sensitive now)
+        if (_proximityDuration >= _proximityThreshold && !_isProximityDialogShowing) {
+          _showProximityExitDialog();
+          timer.cancel();
+        }
+      },
+    );
+  }
+
+  void _resetProximityTimer() {
+    _proximityTimer?.cancel();
+    _proximityTimer = null;
+    _proximityDuration = 0;
   }
 
   void _showProximityExitDialog() {
@@ -307,6 +346,7 @@ class _HomeViewContentState extends State<_HomeViewContent> {
     _searchController?.dispose();
     _accelerometerSubscription?.cancel();
     _proximitySubscription?.cancel();
+    _proximityTimer?.cancel(); // Clean up the proximity timer
     _proximitySubscription = null;
     super.dispose();
   }
