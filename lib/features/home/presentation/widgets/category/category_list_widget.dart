@@ -137,9 +137,10 @@ class CategoryListWidget extends StatelessWidget {
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     gradient: LinearGradient(
@@ -157,21 +158,23 @@ class CategoryListWidget extends StatelessWidget {
                                   ),
                                   child: const Icon(
                                     Icons.category_outlined,
-                                    size: 28,
+                                    size: 24,
                                     color: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  category.categoryTitle,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
-                                    letterSpacing: 0.1,
+                                const SizedBox(height: 8),
+                                Flexible(
+                                  child: Text(
+                                    category.categoryTitle,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                      letterSpacing: 0.1,
+                                    ),
                                   ),
                                 ),
                               ],

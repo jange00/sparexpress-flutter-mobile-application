@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sparexpress/app/service_locator/service_locator.dart';
 import 'package:sparexpress/features/auth/presentation/view/login_view.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/home/presentation/view_model/home_state.dart';
@@ -26,7 +27,7 @@ class HomeViewModel extends Cubit<HomeState> {
           context, 
           MaterialPageRoute(
             builder: (context) => 
-            BlocProvider.value(value: loginViewModel, child: LoginView()),
+            BlocProvider.value(value: serviceLocator<LoginViewModel>(), child: LoginView()),
             ),
           );
       }

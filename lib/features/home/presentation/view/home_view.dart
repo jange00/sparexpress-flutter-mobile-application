@@ -27,6 +27,9 @@ import 'package:sparexpress/features/auth/presentation/view_model/login_view_mod
 import 'package:proximity_sensor/proximity_sensor.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:sparexpress/features/home/presentation/view_model/account/account_view_model/account_state.dart';
+import 'package:sparexpress/features/splash/presentation/view_model/splash_view_model.dart';
+import 'package:sparexpress/features/splash/presentation/view/splash_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -51,7 +54,7 @@ void _onAccelerometerEvent(AccelerometerEvent event) {
     final double acceleration = sqrt(
       event.x * event.x + event.y * event.y + event.z * event.z,
     );
-    print('Acceleration: $acceleration');
+    // print('Acceleration: $acceleration');
     if (acceleration > _shakeThreshold && !_isDialogShowing) {
       _showLogoutDialog();
     }
@@ -279,11 +282,6 @@ class _HomeViewContentState extends State<_HomeViewContent> {
                       _accelerometerSubscription?.cancel();
                       _accelerometerSubscription = null;
                       dialogContext.read<AccountBloc>().add(LogoutRequested());
-                      Navigator.pushReplacement(dialogContext, MaterialPageRoute(builder: (context) => BlocProvider(
-                        create: (_) => serviceLocator<LoginViewModel>(),
-                        child: LoginView(),
-                      )));
-                      // _isDialogShowing = false; // Remove direct set here
                     },
                     child: Text(
                       'Logout',
@@ -319,7 +317,23 @@ class _HomeViewContentState extends State<_HomeViewContent> {
       create: (_) => serviceLocator<CartBloc>()..add(LoadCart()),
       child: BlocProvider(
         create: (_) => serviceLocator<ProfileBloc>()..add(FetchCustomerProfile()),
-        child: BlocBuilder<HomeViewModel, HomeState>(
+        child: BlocProvider(
+          create: (_) => serviceLocator<AccountBloc>(),
+          child: BlocListener<AccountBloc, AccountState>(
+            listener: (context, state) {
+              if (state is LogoutConfirmed) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: serviceLocator<SplashViewModel>(),
+                      child: SplashView(),
+                    ),
+                  ),
+                  (route) => false,
+                );
+              }
+            },
+            child: BlocBuilder<HomeViewModel, HomeState>(
           builder: (context, state) {
             final fullname = state.fullname;
 
@@ -528,6 +542,8 @@ class _HomeViewContentState extends State<_HomeViewContent> {
               ),
             );
           },
+        ),
+      ),
         ),
       ),
     );

@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,10 +14,16 @@ import 'package:sparexpress/features/auth/presentation/view_model/login_view_mod
 import 'package:sparexpress/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:sparexpress/features/auth/presentation/view_model/register_view_model/register_view_model.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:proximity_sensor/proximity_sensor.dart';
 
-class LoginView extends StatelessWidget {
-  LoginView({super.key});
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
 
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController(text: '');
   final _passwordController = TextEditingController(text: '');
@@ -23,6 +32,64 @@ class LoginView extends StatelessWidget {
 
   final _gap = const SizedBox(height: 20);
   final LocalAuthentication _localAuth = LocalAuthentication();
+  
+  StreamSubscription<int>? _proximitySubscription;
+  bool _isProximityDialogShowing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _proximitySubscription = ProximitySensor.events.listen(_onProximityEvent);
+  }
+
+  void _onProximityEvent(int event) {
+    if (event > 0 && !_isProximityDialogShowing) {
+      _showProximityExitDialog();
+    }
+  }
+
+  void _showProximityExitDialog() {
+    _isProximityDialogShowing = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Exit App'),
+        content: const Text('Do you want to exit the app?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _isProximityDialogShowing = false;
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _isProximityDialogShowing = false;
+              Future.delayed(const Duration(milliseconds: 200), () {
+                try {
+                  SystemNavigator.pop();
+                } catch (_) {
+                  exit(0);
+                }
+              });
+            },
+            child: const Text('Exit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _proximitySubscription?.cancel();
+    _proximitySubscription = null;
+    super.dispose();
+  }
 
   Future<void> _authenticateWithBiometrics(BuildContext context) async {
     try {
