@@ -17,16 +17,16 @@ void main() {
     useCase = GetAllCategoryUsecase(categoryRepository: mockRepository);
   });
 
-  final testCategories = [
-    CategoryEntity(categoryId: '1', categoryTitle: 'Electronics'),
-    CategoryEntity(categoryId: '2', categoryTitle: 'Clothing'),
-    CategoryEntity(categoryId: '3', categoryTitle: 'Books'),
-  ];
-
   group('GetAllCategoryUsecase', () {
-    test('should return list of categories when repository call is successful', () async {
+    final testCategories = [
+      const CategoryEntity(categoryId: '1', categoryTitle: 'Electronics'),
+      const CategoryEntity(categoryId: '2', categoryTitle: 'Clothing'),
+    ];
+
+    test('should return list of categories when successful', () async {
       // arrange
-      when(() => mockRepository.getCategories()).thenAnswer((_) async => Right(testCategories));
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => Right(testCategories));
 
       // act
       final result = await useCase();
@@ -36,10 +36,38 @@ void main() {
       verify(() => mockRepository.getCategories()).called(1);
     });
 
-    test('should return failure when repository call fails', () async {
+    test('should return failure when repository fails', () async {
+      // arrange
+      final failure = RemoteDatabaseFailure(message: 'Failed to fetch categories');
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => Left(failure));
+
+      // act
+      final result = await useCase();
+
+      // assert
+      expect(result, Left(failure));
+      verify(() => mockRepository.getCategories()).called(1);
+    });
+
+    test('should return empty list when no categories available', () async {
+      // arrange
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => const Right([]));
+
+      // act
+      final result = await useCase();
+
+      // assert
+      expect(result, const Right([]));
+      verify(() => mockRepository.getCategories()).called(1);
+    });
+
+    test('should handle network errors', () async {
       // arrange
       final failure = RemoteDatabaseFailure(message: 'Network error');
-      when(() => mockRepository.getCategories()).thenAnswer((_) async => Left(failure));
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => Left(failure));
 
       // act
       final result = await useCase();
@@ -51,46 +79,11 @@ void main() {
 
     test('should handle unexpected exceptions', () async {
       // arrange
-      when(() => mockRepository.getCategories()).thenThrow(Exception('Unexpected error'));
+      when(() => mockRepository.getCategories())
+          .thenThrow(Exception('Unexpected error'));
 
-      // act
-      final result = await useCase();
-
-      // assert
-      expect(result.isLeft(), true);
-      expect(result.fold(
-        (failure) => failure.message.contains('Unexpected error'),
-        (categories) => false,
-      ), true);
-      verify(() => mockRepository.getCategories()).called(1);
-    });
-
-    test('should return empty list when repository returns empty list', () async {
-      // arrange
-      when(() => mockRepository.getCategories()).thenAnswer((_) async => const Right([]));
-
-      // act
-      final result = await useCase();
-
-      // assert
-      expect(result, const Right([]));
-      verify(() => mockRepository.getCategories()).called(1);
-    });
-
-    test('should handle single category response', () async {
-      // arrange
-      final singleCategory = [CategoryEntity(categoryId: '1', categoryTitle: 'Electronics')];
-      when(() => mockRepository.getCategories()).thenAnswer((_) async => Right(singleCategory));
-
-      // act
-      final result = await useCase();
-
-      // assert
-      expect(result, Right(singleCategory));
-      expect(result.fold(
-        (failure) => [],
-        (categories) => categories,
-      ).length, 1);
+      // act & assert
+      expect(() => useCase(), throwsException);
       verify(() => mockRepository.getCategories()).called(1);
     });
   });

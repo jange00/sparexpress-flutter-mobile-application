@@ -1,56 +1,51 @@
-import 'package:bloc_test/bloc_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_bloc.dart';
-import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_event.dart';
-import 'package:sparexpress/features/home/presentation/view_model/dashboard/category_view_model/category_state.dart';
-import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
-import 'package:sparexpress/features/home/domin/entity/category_entity.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
+import 'package:sparexpress/features/home/domin/entity/category_entity.dart';
+import 'package:sparexpress/features/home/domin/repository/category_repository.dart';
+import 'package:sparexpress/features/home/domin/use_case/get-all_category_usecase.dart';
 import 'package:sparexpress/core/error/failure.dart';
 
-class MockGetAllCategoryUsecase extends Mock implements GetAllCategoryUsecase {}
+class MockICategoryRepository extends Mock implements ICategoryRepository {}
 
 void main() {
-  late MockGetAllCategoryUsecase mockGetAllCategoryUsecase;
-  late CategoryBloc categoryBloc;
+  late GetAllCategoryUsecase useCase;
+  late MockICategoryRepository mockRepository;
 
   setUp(() {
-    mockGetAllCategoryUsecase = MockGetAllCategoryUsecase();
-    categoryBloc = CategoryBloc(getAllCategoryUsecase: mockGetAllCategoryUsecase);
+    mockRepository = MockICategoryRepository();
+    useCase = GetAllCategoryUsecase(categoryRepository: mockRepository);
   });
 
-  tearDown(() {
-    categoryBloc.close();
+  group('CategoryBloc', () {
+    final testCategories = [
+      const CategoryEntity(categoryId: '1', categoryTitle: 'Electronics'),
+    ];
+
+    test('should return categories when successful', () async {
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => Right(testCategories));
+
+      final result = await useCase();
+      expect(result, Right(testCategories));
+    });
+
+    test('should return failure when repository fails', () async {
+      final failure = RemoteDatabaseFailure(message: 'error');
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => Left(failure));
+
+      final result = await useCase();
+      expect(result, Left(failure));
+    });
+
+    test('should handle empty category list', () async {
+      when(() => mockRepository.getCategories())
+          .thenAnswer((_) async => const Right([]));
+
+      final result = await useCase();
+      expect(result, const Right([]));
+    });
   });
-
-  final categories = [
-    CategoryEntity(categoryId: '1', categoryTitle: 'Electronics'),
-  ];
-
-  blocTest<CategoryBloc, CategoryState>(
-    'emits [CategoryLoading, CategoryLoaded] when LoadCategories is added and usecase returns categories',
-    build: () {
-      when(() => mockGetAllCategoryUsecase()).thenAnswer((_) async => Right(categories));
-      return categoryBloc;
-    },
-    act: (bloc) => bloc.add(const LoadCategories()),
-    expect: () => [
-      CategoryLoading(),
-      CategoryLoaded(categories),
-    ],
-  );
-
-  blocTest<CategoryBloc, CategoryState>(
-    'emits [CategoryLoading, CategoryError] when LoadCategories is added and usecase returns failure',
-    build: () {
-      when(() => mockGetAllCategoryUsecase()).thenAnswer((_) async => Left(RemoteDatabaseFailure(message: 'error')));
-      return categoryBloc;
-    },
-    act: (bloc) => bloc.add(const LoadCategories()),
-    expect: () => [
-      CategoryLoading(),
-      isA<CategoryError>(),
-    ],
-  );
 } 

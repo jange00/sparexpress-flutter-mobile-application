@@ -48,6 +48,7 @@ class OfferItemCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Make column take minimum space
           children: [
             // Image with discount badge
             ClipRRect(
@@ -56,31 +57,31 @@ class OfferItemCard extends StatelessWidget {
                 children: [
                   CachedNetworkImage(
                     imageUrl: "${ApiEndpoints.serverAddress}/${product.image.first}",
-                    height: 100,
+                    height: 90, // Reduced from 100
                     width: double.infinity,
                     fit: BoxFit.cover,
                     placeholder: (_, __) => const Center(
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                     errorWidget: (_, __, ___) => Container(
-                      height: 100,
+                      height: 90, // Reduced from 100
                       color: Colors.grey[300],
                       child: const Icon(Icons.broken_image, size: 40),
                     ),
                   ),
                   if (hasDiscount)
                     Positioned(
-                      top: 8,
-                      left: 8,
+                      top: 6, // Reduced from 8
+                      left: 6, // Reduced from 8
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), // Reduced padding
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [Color(0xFFFF7043), Color(0xFFFFA726)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6), // Reduced from 8
                           boxShadow: [
                             BoxShadow(
                               color: Colors.orange.withOpacity(0.18),
@@ -93,7 +94,7 @@ class OfferItemCard extends StatelessWidget {
                           "-${product.discount!.toStringAsFixed(0)}% OFF",
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 13,
+                            fontSize: 11, // Reduced from 13
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
                           ),
@@ -103,15 +104,15 @@ class OfferItemCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8), // Reduced from 10
             // Product Name
             Text(
               product.name,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.2),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.2), // Reduced from 15
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4), // Reduced from 6
             // Price Row
             Row(
               children: [
@@ -119,20 +120,20 @@ class OfferItemCard extends StatelessWidget {
                   child: Text(
                     "Rs.${formatPrice(discountedPrice)}",
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 14, // Reduced from 15
                       fontWeight: FontWeight.w700,
                       color: Colors.deepOrange[800],
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6), // Reduced from 8
                 if (hasDiscount)
                   Flexible(
                     child: Text(
                       "Rs.${formatPrice(product.price)}",
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11, // Reduced from 12
                         color: Colors.grey,
                         decoration: TextDecoration.lineThrough,
                       ),
@@ -141,20 +142,20 @@ class OfferItemCard extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6), // Reduced from 8
             if (product.stock == 0)
               Container(
-                margin: const EdgeInsets.only(top: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                margin: const EdgeInsets.only(top: 2), // Reduced from 4
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), // Reduced padding
                 decoration: BoxDecoration(
                   color: Colors.red[400],
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(4), // Reduced from 6
                 ),
                 child: const Text(
                   "Out of Stock",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 11,
+                    fontSize: 10, // Reduced from 11
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -165,15 +166,15 @@ class OfferItemCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: onTap,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // Reduced padding
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6), // Reduced from 8
                     ),
                     elevation: 0,
                   ),
                   child: const Text(
                     "Shop Now",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12), // Reduced from 13
                   ),
                 ),
               ),
